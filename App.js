@@ -1,20 +1,36 @@
+import React, { useEffect } from 'react';
+import { View, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ThemeProvider, useTheme } from './src/theme';
+import { LanguageProvider } from './src/context';
+import { AppNavigator } from './src/navigation';
+import { runDataMigration } from './src/services/storage';
+
+const AppContent = () => {
+  const { isDarkMode } = useTheme();
+
+  return (
+    <>
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
+      <AppNavigator />
+    </>
+  );
+};
 
 export default function App() {
+  // Run data migration on app start to fix corrupted storage
+  useEffect(() => {
+    runDataMigration();
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <LanguageProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </LanguageProvider>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

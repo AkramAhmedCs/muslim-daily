@@ -1,0 +1,452 @@
+{
+  "source": "Authenticated Hadith Collections",
+  "collections": [
+    {
+      "id": "bukhari",
+      "name": "Sahih al-Bukhari",
+      "arabicName": "صحيح البخاري",
+      "compiler": "Imam al-Bukhari",
+      "grade": "Sahih",
+      "hadith": [
+        {
+          "id": "bukhari_1",
+          "bookName": "Revelation",
+          "chapter": "How the Divine Revelation started",
+          "hadithNumber": "1",
+          "arabic": "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى، فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى دُنْيَا يُصِيبُهَا أَوْ إِلَى امْرَأَةٍ يَنْكِحُهَا فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ",
+          "english": "The reward of deeds depends upon the intentions and every person will get the reward according to what he has intended. So whoever emigrated for worldly benefits or for a woman to marry, his emigration was for what he emigrated for.",
+          "narrator": "Umar ibn al-Khattab"
+        },
+        {
+          "id": "bukhari_2",
+          "bookName": "Belief",
+          "chapter": "The Prophet's statement: Islam is based on five things",
+          "hadithNumber": "8",
+          "arabic": "بُنِيَ الإِسْلاَمُ عَلَى خَمْسٍ شَهَادَةِ أَنْ لاَ إِلَهَ إِلاَّ اللَّهُ وَأَنَّ مُحَمَّدًا رَسُولُ اللَّهِ، وَإِقَامِ الصَّلاَةِ، وَإِيتَاءِ الزَّكَاةِ، وَالْحَجِّ، وَصَوْمِ رَمَضَانَ",
+          "english": "Islam is based on five things: the testimony that there is no god but Allah and that Muhammad is the Messenger of Allah, the establishment of prayer, the giving of zakat, pilgrimage, and fasting in Ramadan.",
+          "narrator": "Ibn Umar"
+        },
+        {
+          "id": "bukhari_3",
+          "bookName": "Knowledge",
+          "chapter": "The superiority of religious knowledge",
+          "hadithNumber": "71",
+          "arabic": "مَنْ يُرِدِ اللَّهُ بِهِ خَيْرًا يُفَقِّهْهُ فِي الدِّينِ",
+          "english": "If Allah wants good for someone, He makes him understand the religion.",
+          "narrator": "Muawiya"
+        },
+        {
+          "id": "bukhari_4",
+          "bookName": "Ablutions",
+          "chapter": "Cleanliness is half of faith",
+          "hadithNumber": "135",
+          "arabic": "لاَ يَقْبَلُ اللَّهُ صَلاَةَ أَحَدِكُمْ إِذَا أَحْدَثَ حَتَّى يَتَوَضَّأَ",
+          "english": "Allah does not accept the prayer of anyone of you if he does Hadath (passes wind) till he performs the ablution.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "bukhari_5",
+          "bookName": "Prayer",
+          "chapter": "Salat is a pillar of Islam",
+          "hadithNumber": "506",
+          "arabic": "صَلُّوا كَمَا رَأَيْتُمُونِي أُصَلِّي",
+          "english": "Pray as you have seen me praying.",
+          "narrator": "Malik ibn al-Huwayrith"
+        },
+        {
+          "id": "bukhari_6",
+          "bookName": "Friday Prayer",
+          "chapter": "Virtues of Friday",
+          "hadithNumber": "876",
+          "arabic": "خَيْرُ يَوْمٍ طَلَعَتْ عَلَيْهِ الشَّمْسُ يَوْمُ الْجُمُعَةِ",
+          "english": "The best day the sun rises over is Friday.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "bukhari_7",
+          "bookName": "Fasting",
+          "chapter": "Virtues of Ramadan",
+          "hadithNumber": "1901",
+          "arabic": "مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ",
+          "english": "Whoever fasts Ramadan out of faith and seeking reward, his previous sins will be forgiven.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "bukhari_8",
+          "bookName": "Zakat",
+          "chapter": "Obligation of Zakat",
+          "hadithNumber": "1395",
+          "arabic": "مَا مِنْ صَاحِبِ ذَهَبٍ وَلاَ فِضَّةٍ لاَ يُؤَدِّي مِنْهَا حَقَّهَا إِلاَّ إِذَا كَانَ يَوْمُ الْقِيَامَةِ صُفِّحَتْ لَهُ صَفَائِحُ مِنْ نَارٍ",
+          "english": "No owner of gold or silver who does not give its due right, but on the Day of Resurrection, plates of fire will be prepared for him.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "bukhari_9",
+          "bookName": "Hajj",
+          "chapter": "Obligation of Hajj",
+          "hadithNumber": "1521",
+          "arabic": "الْعُمْرَةُ إِلَى الْعُمْرَةِ كَفَّارَةٌ لِمَا بَيْنَهُمَا، وَالْحَجُّ الْمَبْرُورُ لَيْسَ لَهُ جَزَاءٌ إِلاَّ الْجَنَّةُ",
+          "english": "Umrah to Umrah is expiation for what is between them, and Hajj Mabrur has no reward except Paradise.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "bukhari_10",
+          "bookName": "Good Manners",
+          "chapter": "Being merciful to others",
+          "hadithNumber": "6013",
+          "arabic": "مَنْ لاَ يَرْحَمُ النَّاسَ لاَ يَرْحَمْهُ اللَّهُ",
+          "english": "Whoever is not merciful to the people, Allah will not be merciful to him.",
+          "narrator": "Jarir ibn Abdullah"
+        },
+        {
+          "id": "bukhari_11",
+          "bookName": "Good Manners",
+          "chapter": "Gentleness in all matters",
+          "hadithNumber": "6024",
+          "arabic": "إِنَّ اللَّهَ رَفِيقٌ يُحِبُّ الرِّفْقَ فِي الأَمْرِ كُلِّهِ",
+          "english": "Allah is gentle and loves gentleness in all matters.",
+          "narrator": "Aisha"
+        },
+        {
+          "id": "bukhari_12",
+          "bookName": "Invocations",
+          "chapter": "The best supplication",
+          "hadithNumber": "6306",
+          "arabic": "سَيِّدُ الاِسْتِغْفَارِ أَنْ تَقُولَ اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ",
+          "english": "The chief of supplications for forgiveness is to say: O Allah, You are my Lord, there is no deity except You...",
+          "narrator": "Shaddad ibn Aws"
+        },
+        {
+          "id": "bukhari_13",
+          "bookName": "Heart-Softening",
+          "chapter": "Remembrance of death",
+          "hadithNumber": "6416",
+          "arabic": "أَكْثِرُوا ذِكْرَ هَاذِمِ اللَّذَّاتِ",
+          "english": "Remember often the destroyer of pleasures (death).",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "bukhari_14",
+          "bookName": "Heart-Softening",
+          "chapter": "Long hopes",
+          "hadithNumber": "6417",
+          "arabic": "لاَ يَزَالُ قَلْبُ الْكَبِيرِ شَابًّا فِي اثْنَتَيْنِ فِي حُبِّ الدُّنْيَا وَطُولِ الأَمَلِ",
+          "english": "The heart of an old person remains young in two matters: love of wealth and long hopes.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "bukhari_15",
+          "bookName": "Holding Fast to Quran and Sunnah",
+          "chapter": "Following the Sunnah",
+          "hadithNumber": "7280",
+          "arabic": "كُلُّ أُمَّتِي يَدْخُلُونَ الْجَنَّةَ إِلاَّ مَنْ أَبَى",
+          "english": "All my followers will enter Paradise except those who refuse.",
+          "narrator": "Abu Hurairah"
+        }
+      ]
+    },
+    {
+      "id": "muslim",
+      "name": "Sahih Muslim",
+      "arabicName": "صحيح مسلم",
+      "compiler": "Imam Muslim",
+      "grade": "Sahih",
+      "hadith": [
+        {
+          "id": "muslim_1",
+          "bookName": "Faith",
+          "chapter": "Islam defined",
+          "hadithNumber": "8",
+          "arabic": "الإِسْلاَمُ أَنْ تَشْهَدَ أَنْ لاَ إِلَهَ إِلاَّ اللَّهُ وَأَنَّ مُحَمَّدًا رَسُولُ اللَّهِ وَتُقِيمَ الصَّلاَةَ وَتُؤْتِيَ الزَّكَاةَ وَتَصُومَ رَمَضَانَ وَتَحُجَّ الْبَيْتَ إِنِ اسْتَطَعْتَ إِلَيْهِ سَبِيلاً",
+          "english": "Islam is to testify that there is no god but Allah and that Muhammad is the Messenger of Allah, to establish prayer, to give zakat, to fast Ramadan, and to make pilgrimage to the House if you are able.",
+          "narrator": "Umar ibn al-Khattab"
+        },
+        {
+          "id": "muslim_2",
+          "bookName": "Faith",
+          "chapter": "Signs of a hypocrite",
+          "hadithNumber": "58",
+          "arabic": "آيَةُ الْمُنَافِقِ ثَلاَثٌ إِذَا حَدَّثَ كَذَبَ وَإِذَا وَعَدَ أَخْلَفَ وَإِذَا اؤْتُمِنَ خَانَ",
+          "english": "There are three signs of a hypocrite: when he speaks he lies, when he promises he breaks it, and when he is trusted he betrays.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "muslim_3",
+          "bookName": "Purification",
+          "chapter": "Cleanliness is half of faith",
+          "hadithNumber": "223",
+          "arabic": "الطُّهُورُ شَطْرُ الإِيمَانِ وَالْحَمْدُ لِلَّهِ تَمْلأُ الْمِيزَانَ",
+          "english": "Cleanliness is half of faith, and (saying) Al-Hamdu Lillah fills the scale.",
+          "narrator": "Abu Malik al-Ashari"
+        },
+        {
+          "id": "muslim_4",
+          "bookName": "Prayer",
+          "chapter": "Five daily prayers",
+          "hadithNumber": "667",
+          "arabic": "الصَّلَوَاتُ الْخَمْسُ وَالْجُمُعَةُ إِلَى الْجُمُعَةِ كَفَّارَةٌ لِمَا بَيْنَهُنَّ مَا لَمْ تُغْشَ الْكَبَائِرُ",
+          "english": "The five prayers and Friday to Friday are expiation for what is between them, as long as major sins are avoided.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "muslim_5",
+          "bookName": "Prayer of Travellers",
+          "chapter": "Night prayer",
+          "hadithNumber": "758",
+          "arabic": "أَقْرَبُ مَا يَكُونُ الْعَبْدُ مِنْ رَبِّهِ وَهُوَ سَاجِدٌ فَأَكْثِرُوا الدُّعَاءَ",
+          "english": "The closest a servant is to his Lord is when he is prostrating, so increase your supplication.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "muslim_6",
+          "bookName": "Zakat",
+          "chapter": "Charity from pure earnings",
+          "hadithNumber": "1014",
+          "arabic": "مَا نَقَصَتْ صَدَقَةٌ مِنْ مَالٍ",
+          "english": "Charity does not decrease wealth.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "muslim_7",
+          "bookName": "Fasting",
+          "chapter": "Gates of Paradise",
+          "hadithNumber": "1152",
+          "arabic": "إِنَّ فِي الْجَنَّةِ بَابًا يُقَالُ لَهُ الرَّيَّانُ يَدْخُلُ مِنْهُ الصَّائِمُونَ يَوْمَ الْقِيَامَةِ",
+          "english": "There is a gate in Paradise called Ar-Rayyan through which those who fast will enter on the Day of Resurrection.",
+          "narrator": "Sahl ibn Sad"
+        },
+        {
+          "id": "muslim_8",
+          "bookName": "Pilgrimage",
+          "chapter": "Pilgrimage wipes out sins",
+          "hadithNumber": "1350",
+          "arabic": "مَنْ حَجَّ لِلَّهِ فَلَمْ يَرْفُثْ وَلَمْ يَفْسُقْ رَجَعَ كَيَوْمٍ وَلَدَتْهُ أُمُّهُ",
+          "english": "Whoever performs Hajj for Allah and does not engage in sexual relations or commit sins returns like the day his mother gave birth to him.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "muslim_9",
+          "bookName": "Remembrance",
+          "chapter": "Virtue of remembrance",
+          "hadithNumber": "2689",
+          "arabic": "كَلِمَتَانِ خَفِيفَتَانِ عَلَى اللِّسَانِ ثَقِيلَتَانِ فِي الْمِيزَانِ حَبِيبَتَانِ إِلَى الرَّحْمَنِ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ سُبْحَانَ اللَّهِ الْعَظِيمِ",
+          "english": "Two words are light on the tongue, heavy on the scale, beloved to the Most Merciful: SubhanAllahi wa bihamdihi, SubhanAllahil Azeem.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "muslim_10",
+          "bookName": "Remembrance",
+          "chapter": "Excellence of Quran",
+          "hadithNumber": "810",
+          "arabic": "اقْرَءُوا الْقُرْآنَ فَإِنَّهُ يَأْتِي يَوْمَ الْقِيَامَةِ شَفِيعًا لأَصْحَابِهِ",
+          "english": "Recite the Quran, for it will come on the Day of Resurrection as an intercessor for its companions.",
+          "narrator": "Abu Umamah"
+        },
+        {
+          "id": "muslim_11",
+          "bookName": "Righteousness",
+          "chapter": "Mutual love",
+          "hadithNumber": "2586",
+          "arabic": "لاَ تَدْخُلُونَ الْجَنَّةَ حَتَّى تُؤْمِنُوا وَلاَ تُؤْمِنُوا حَتَّى تَحَابُّوا أَوَلاَ أَدُلُّكُمْ عَلَى شَىْءٍ إِذَا فَعَلْتُمُوهُ تَحَابَبْتُمْ أَفْشُوا السَّلاَمَ بَيْنَكُمْ",
+          "english": "You will not enter Paradise until you believe, and you will not believe until you love one another. Shall I guide you to something which if you do, you will love one another? Spread the greeting of peace among you.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "muslim_12",
+          "bookName": "Righteousness",
+          "chapter": "Prohibition of injustice",
+          "hadithNumber": "2577",
+          "arabic": "يَا عِبَادِي إِنِّي حَرَّمْتُ الظُّلْمَ عَلَى نَفْسِي وَجَعَلْتُهُ بَيْنَكُمْ مُحَرَّمًا فَلاَ تَظَالَمُوا",
+          "english": "O My servants, I have forbidden oppression for Myself and have made it forbidden among you, so do not oppress one another.",
+          "narrator": "Abu Dharr"
+        },
+        {
+          "id": "muslim_13",
+          "bookName": "Destiny",
+          "chapter": "Divine decree",
+          "hadithNumber": "2664",
+          "arabic": "عَجِبًا لأَمْرِ الْمُؤْمِنِ إِنَّ أَمْرَهُ كُلَّهُ خَيْرٌ وَلَيْسَ ذَاكَ لأَحَدٍ إِلاَّ لِلْمُؤْمِنِ إِنْ أَصَابَتْهُ سَرَّاءُ شَكَرَ فَكَانَ خَيْرًا لَهُ وَإِنْ أَصَابَتْهُ ضَرَّاءُ صَبَرَ فَكَانَ خَيْرًا لَهُ",
+          "english": "How wonderful is the affair of the believer! His affairs are all good for him, and this is only for the believer. If something good happens to him, he is grateful and that is good for him. If something bad happens to him, he is patient and that is good for him.",
+          "narrator": "Suhaib"
+        },
+        {
+          "id": "muslim_14",
+          "bookName": "Paradise",
+          "chapter": "Description of Paradise",
+          "hadithNumber": "2825",
+          "arabic": "فِيهَا مَا لاَ عَيْنٌ رَأَتْ وَلاَ أُذُنٌ سَمِعَتْ وَلاَ خَطَرَ عَلَى قَلْبِ بَشَرٍ",
+          "english": "In it (Paradise) is what no eye has seen, no ear has heard, and no human heart has ever conceived.",
+          "narrator": "Abu Hurairah"
+        },
+        {
+          "id": "muslim_15",
+          "bookName": "Asceticism",
+          "chapter": "The world is a prison",
+          "hadithNumber": "2956",
+          "arabic": "الدُّنْيَا سِجْنُ الْمُؤْمِنِ وَجَنَّةُ الْكَافِرِ",
+          "english": "The world is a prison for the believer and a paradise for the disbeliever.",
+          "narrator": "Abu Hurairah"
+        }
+      ]
+    },
+    {
+      "id": "riyad",
+      "name": "Riyad as-Salihin",
+      "arabicName": "رياض الصالحين",
+      "compiler": "Imam an-Nawawi",
+      "grade": "Authentic",
+      "hadith": [
+        {
+          "id": "riyad_1",
+          "bookName": "Good Manners",
+          "chapter": "Sincerity",
+          "hadithNumber": "1",
+          "arabic": "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى",
+          "english": "Actions are judged by intentions, and every person will get what they intended.",
+          "narrator": "Umar ibn al-Khattab",
+          "source": "Bukhari & Muslim"
+        },
+        {
+          "id": "riyad_2",
+          "bookName": "Good Manners",
+          "chapter": "Repentance",
+          "hadithNumber": "13",
+          "arabic": "لَلَّهُ أَفْرَحُ بِتَوْبَةِ عَبْدِهِ مِنْ أَحَدِكُمْ سَقَطَ عَلَى بَعِيرِهِ وَقَدْ أَضَلَّهُ فِي أَرْضٍ فَلاَةٍ",
+          "english": "Allah is more pleased with the repentance of His servant than one of you who finds his camel after losing it in the desert.",
+          "narrator": "Anas ibn Malik",
+          "source": "Muslim"
+        },
+        {
+          "id": "riyad_3",
+          "bookName": "Good Manners",
+          "chapter": "Patience",
+          "hadithNumber": "25",
+          "arabic": "وَمَنْ يَتَصَبَّرْ يُصَبِّرْهُ اللَّهُ وَمَا أُعْطِيَ أَحَدٌ عَطَاءً خَيْرًا وَأَوْسَعَ مِنَ الصَّبْرِ",
+          "english": "Whoever tries to be patient, Allah will give him patience. No one has been given a gift better and more comprehensive than patience.",
+          "narrator": "Abu Said al-Khudri",
+          "source": "Bukhari & Muslim"
+        },
+        {
+          "id": "riyad_4",
+          "bookName": "Good Manners",
+          "chapter": "Truthfulness",
+          "hadithNumber": "54",
+          "arabic": "إِنَّ الصِّدْقَ يَهْدِي إِلَى الْبِرِّ وَإِنَّ الْبِرَّ يَهْدِي إِلَى الْجَنَّةِ",
+          "english": "Truthfulness leads to righteousness, and righteousness leads to Paradise.",
+          "narrator": "Abdullah ibn Masud",
+          "source": "Bukhari & Muslim"
+        },
+        {
+          "id": "riyad_5",
+          "bookName": "Good Manners",
+          "chapter": "Guarding the tongue",
+          "hadithNumber": "68",
+          "arabic": "مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ",
+          "english": "Whoever believes in Allah and the Last Day, let him speak good or remain silent.",
+          "narrator": "Abu Hurairah",
+          "source": "Bukhari & Muslim"
+        },
+        {
+          "id": "riyad_6",
+          "bookName": "Kindness",
+          "chapter": "Kindness to parents",
+          "hadithNumber": "316",
+          "arabic": "رِضَا اللَّهِ فِي رِضَا الْوَالِدِ وَسَخَطُ اللَّهِ فِي سَخَطِ الْوَالِدِ",
+          "english": "The pleasure of Allah is in the pleasure of the parent, and the displeasure of Allah is in the displeasure of the parent.",
+          "narrator": "Abdullah ibn Amr",
+          "source": "Tirmidhi"
+        },
+        {
+          "id": "riyad_7",
+          "bookName": "Kindness",
+          "chapter": "Rights of neighbors",
+          "hadithNumber": "309",
+          "arabic": "مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الآخِرِ فَلاَ يُؤْذِ جَارَهُ",
+          "english": "Whoever believes in Allah and the Last Day should not harm his neighbor.",
+          "narrator": "Abu Hurairah",
+          "source": "Bukhari & Muslim"
+        },
+        {
+          "id": "riyad_8",
+          "bookName": "Kindness",
+          "chapter": "Visiting the sick",
+          "hadithNumber": "896",
+          "arabic": "مَنْ عَادَ مَرِيضًا لَمْ يَزَلْ فِي خُرْفَةِ الْجَنَّةِ حَتَّى يَرْجِعَ",
+          "english": "Whoever visits a sick person continues to be in the harvest of Paradise until he returns.",
+          "narrator": "Muslim",
+          "source": "Muslim"
+        },
+        {
+          "id": "riyad_9",
+          "bookName": "Remembrance",
+          "chapter": "Morning and evening adhkar",
+          "hadithNumber": "1456",
+          "arabic": "مَنْ قَالَ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ فِي يَوْمٍ مِائَةَ مَرَّةٍ حُطَّتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ",
+          "english": "Whoever says 'SubhanAllahi wa bihamdihi' 100 times a day will have their sins removed even if they were like the foam of the sea.",
+          "narrator": "Abu Hurairah",
+          "source": "Bukhari & Muslim"
+        },
+        {
+          "id": "riyad_10",
+          "bookName": "Supplication",
+          "chapter": "Excellence of supplication",
+          "hadithNumber": "1465",
+          "arabic": "الدُّعَاءُ هُوَ الْعِبَادَةُ",
+          "english": "Supplication is worship.",
+          "narrator": "An-Numan ibn Bashir",
+          "source": "Tirmidhi"
+        },
+        {
+          "id": "riyad_11",
+          "bookName": "Etiquette",
+          "chapter": "Smiling",
+          "hadithNumber": "121",
+          "arabic": "تَبَسُّمُكَ فِي وَجْهِ أَخِيكَ لَكَ صَدَقَةٌ",
+          "english": "Your smile in the face of your brother is charity.",
+          "narrator": "Abu Dharr",
+          "source": "Tirmidhi"
+        },
+        {
+          "id": "riyad_12",
+          "bookName": "Etiquette",
+          "chapter": "Good character",
+          "hadithNumber": "631",
+          "arabic": "أَكْمَلُ الْمُؤْمِنِينَ إِيمَانًا أَحْسَنُهُمْ خُلُقًا",
+          "english": "The most complete of believers in faith are those best in character.",
+          "narrator": "Abu Hurairah",
+          "source": "Tirmidhi"
+        },
+        {
+          "id": "riyad_13",
+          "bookName": "Worldly",
+          "chapter": "Contentment",
+          "hadithNumber": "522",
+          "arabic": "ازْهَدْ فِي الدُّنْيَا يُحِبَّكَ اللَّهُ وَازْهَدْ فِيمَا عِنْدَ النَّاسِ يُحِبَّكَ النَّاسُ",
+          "english": "Be detached from the world and Allah will love you. Be detached from what people have and people will love you.",
+          "narrator": "Sahl ibn Sad",
+          "source": "Ibn Majah"
+        },
+        {
+          "id": "riyad_14",
+          "bookName": "Paradise",
+          "chapter": "Paths to Paradise",
+          "hadithNumber": "183",
+          "arabic": "مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ",
+          "english": "Whoever takes a path seeking knowledge, Allah will make easy for him a path to Paradise.",
+          "narrator": "Abu Hurairah",
+          "source": "Muslim"
+        },
+        {
+          "id": "riyad_15",
+          "bookName": "Misc",
+          "chapter": "Value of this world",
+          "hadithNumber": "480",
+          "arabic": "لَوْ كَانَتِ الدُّنْيَا تَعْدِلُ عِنْدَ اللَّهِ جَنَاحَ بَعُوضَةٍ مَا سَقَى كَافِرًا مِنْهَا شَرْبَةَ مَاءٍ",
+          "english": "If the world was worth even a mosquito's wing to Allah, He would not have given a disbeliever a single drink of water from it.",
+          "narrator": "Sahl ibn Sad",
+          "source": "Tirmidhi"
+        }
+      ]
+    }
+  ]
+}

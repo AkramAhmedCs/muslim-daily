@@ -1,0 +1,305 @@
+{
+  "surahs": [
+    {
+      "number": 1,
+      "nameAr": "الفاتحة",
+      "nameEn": "Al-Fatihah",
+      "englishMeaning": "The Opening",
+      "revelationType": "Meccan",
+      "versesCount": 7,
+      "verses": [
+        {
+          "number": 1,
+          "arabicText": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+          "englishTranslation": "In the name of Allah, the Entirely Merciful, the Especially Merciful.",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 2,
+          "arabicText": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+          "englishTranslation": "[All] praise is [due] to Allah, Lord of the worlds -",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 3,
+          "arabicText": "الرَّحْمَٰنِ الرَّحِيمِ",
+          "englishTranslation": "The Entirely Merciful, the Especially Merciful,",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 4,
+          "arabicText": "مَالِكِ يَوْمِ الدِّينِ",
+          "englishTranslation": "Sovereign of the Day of Recompense.",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 5,
+          "arabicText": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+          "englishTranslation": "It is You we worship and You we ask for help.",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 6,
+          "arabicText": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+          "englishTranslation": "Guide us to the straight path -",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 7,
+          "arabicText": "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
+          "englishTranslation": "The path of those upon whom You have bestowed favor, not of those who have earned [Your] anger or of those who are astray.",
+          "translationSource": "Saheeh International"
+        }
+      ]
+    },
+    {
+      "number": 112,
+      "nameAr": "الإخلاص",
+      "nameEn": "Al-Ikhlas",
+      "englishMeaning": "The Sincerity",
+      "revelationType": "Meccan",
+      "versesCount": 4,
+      "verses": [
+        {
+          "number": 1,
+          "arabicText": "قُلْ هُوَ اللَّهُ أَحَدٌ",
+          "englishTranslation": "Say, \"He is Allah, [who is] One,",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 2,
+          "arabicText": "اللَّهُ الصَّمَدُ",
+          "englishTranslation": "Allah, the Eternal Refuge.",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 3,
+          "arabicText": "لَمْ يَلِدْ وَلَمْ يُولَدْ",
+          "englishTranslation": "He neither begets nor is born,",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 4,
+          "arabicText": "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
+          "englishTranslation": "Nor is there to Him any equivalent.\"",
+          "translationSource": "Saheeh International"
+        }
+      ]
+    },
+    {
+      "number": 113,
+      "nameAr": "الفلق",
+      "nameEn": "Al-Falaq",
+      "englishMeaning": "The Daybreak",
+      "revelationType": "Meccan",
+      "versesCount": 5,
+      "verses": [
+        {
+          "number": 1,
+          "arabicText": "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ",
+          "englishTranslation": "Say, \"I seek refuge in the Lord of daybreak",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 2,
+          "arabicText": "مِن شَرِّ مَا خَلَقَ",
+          "englishTranslation": "From the evil of that which He created",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 3,
+          "arabicText": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
+          "englishTranslation": "And from the evil of darkness when it settles",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 4,
+          "arabicText": "وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ",
+          "englishTranslation": "And from the evil of the blowers in knots",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 5,
+          "arabicText": "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+          "englishTranslation": "And from the evil of an envier when he envies.\"",
+          "translationSource": "Saheeh International"
+        }
+      ]
+    },
+    {
+      "number": 114,
+      "nameAr": "الناس",
+      "nameEn": "An-Nas",
+      "englishMeaning": "Mankind",
+      "revelationType": "Meccan",
+      "versesCount": 6,
+      "verses": [
+        {
+          "number": 1,
+          "arabicText": "قُلْ أَعُوذُ بِرَبِّ النَّاسِ",
+          "englishTranslation": "Say, \"I seek refuge in the Lord of mankind,",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 2,
+          "arabicText": "مَلِكِ النَّاسِ",
+          "englishTranslation": "The Sovereign of mankind,",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 3,
+          "arabicText": "إِلَٰهِ النَّاسِ",
+          "englishTranslation": "The God of mankind,",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 4,
+          "arabicText": "مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ",
+          "englishTranslation": "From the evil of the retreating whisperer -",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 5,
+          "arabicText": "الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ",
+          "englishTranslation": "Who whispers [evil] into the breasts of mankind -",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 6,
+          "arabicText": "مِنَ الْجِنَّةِ وَالنَّاسِ",
+          "englishTranslation": "From among the jinn and mankind.\"",
+          "translationSource": "Saheeh International"
+        }
+      ]
+    },
+    {
+      "number": 36,
+      "nameAr": "يس",
+      "nameEn": "Ya-Sin",
+      "englishMeaning": "Ya Sin",
+      "revelationType": "Meccan",
+      "versesCount": 83,
+      "verses": [
+        {
+          "number": 1,
+          "arabicText": "يس",
+          "englishTranslation": "Ya, Sin.",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 2,
+          "arabicText": "وَالْقُرْآنِ الْحَكِيمِ",
+          "englishTranslation": "By the wise Qur'an.",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 3,
+          "arabicText": "إِنَّكَ لَمِنَ الْمُرْسَلِينَ",
+          "englishTranslation": "Indeed you, [O Muhammad], are from among the messengers,",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 4,
+          "arabicText": "عَلَىٰ صِرَاطٍ مُّسْتَقِيمٍ",
+          "englishTranslation": "On a straight path.",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 5,
+          "arabicText": "تَنزِيلَ الْعَزِيزِ الرَّحِيمِ",
+          "englishTranslation": "[This is] a revelation of the Exalted in Might, the Merciful,",
+          "translationSource": "Saheeh International"
+        }
+      ],
+      "note": "First 5 verses shown. Full surah contains 83 verses."
+    },
+    {
+      "number": 67,
+      "nameAr": "الملك",
+      "nameEn": "Al-Mulk",
+      "englishMeaning": "The Sovereignty",
+      "revelationType": "Meccan",
+      "versesCount": 30,
+      "verses": [
+        {
+          "number": 1,
+          "arabicText": "تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+          "englishTranslation": "Blessed is He in whose hand is dominion, and He is over all things competent -",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 2,
+          "arabicText": "الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا ۚ وَهُوَ الْعَزِيزُ الْغَفُورُ",
+          "englishTranslation": "[He] who created death and life to test you [as to] which of you is best in deed - and He is the Exalted in Might, the Forgiving -",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 3,
+          "arabicText": "الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا ۖ مَّا تَرَىٰ فِي خَلْقِ الرَّحْمَٰنِ مِن تَفَاوُتٍ ۖ فَارْجِعِ الْبَصَرَ هَلْ تَرَىٰ مِن فُطُورٍ",
+          "englishTranslation": "[And] who created seven heavens in layers. You do not see in the creation of the Most Merciful any inconsistency. So return [your] vision [to the sky]; do you see any breaks?",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 4,
+          "arabicText": "ثُمَّ ارْجِعِ الْبَصَرَ كَرَّتَيْنِ يَنقَلِبْ إِلَيْكَ الْبَصَرُ خَاسِئًا وَهُوَ حَسِيرٌ",
+          "englishTranslation": "Then return [your] vision twice again. [Your] vision will return to you humbled while it is fatigued.",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 5,
+          "arabicText": "وَلَقَدْ زَيَّنَّا السَّمَاءَ الدُّنْيَا بِمَصَابِيحَ وَجَعَلْنَاهَا رُجُومًا لِّلشَّيَاطِينِ ۖ وَأَعْتَدْنَا لَهُمْ عَذَابَ السَّعِيرِ",
+          "englishTranslation": "And We have certainly beautified the nearest heaven with stars and have made [from] them what is thrown at the devils and have prepared for them the punishment of the Blaze.",
+          "translationSource": "Saheeh International"
+        }
+      ],
+      "note": "First 5 verses shown. Full surah contains 30 verses."
+    },
+    {
+      "number": 55,
+      "nameAr": "الرحمن",
+      "nameEn": "Ar-Rahman",
+      "englishMeaning": "The Beneficent",
+      "revelationType": "Medinan",
+      "versesCount": 78,
+      "verses": [
+        {
+          "number": 1,
+          "arabicText": "الرَّحْمَٰنُ",
+          "englishTranslation": "The Most Merciful",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 2,
+          "arabicText": "عَلَّمَ الْقُرْآنَ",
+          "englishTranslation": "Taught the Qur'an,",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 3,
+          "arabicText": "خَلَقَ الْإِنسَانَ",
+          "englishTranslation": "Created man,",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 4,
+          "arabicText": "عَلَّمَهُ الْبَيَانَ",
+          "englishTranslation": "[And] taught him eloquence.",
+          "translationSource": "Saheeh International"
+        },
+        {
+          "number": 5,
+          "arabicText": "الشَّمْسُ وَالْقَمَرُ بِحُسْبَانٍ",
+          "englishTranslation": "The sun and the moon [move] by precise calculation,",
+          "translationSource": "Saheeh International"
+        }
+      ],
+      "note": "First 5 verses shown. Full surah contains 78 verses."
+    }
+  ],
+  "metadata": {
+    "source": "Tanzil.net",
+    "script": "Uthmani",
+    "translation": "Saheeh International",
+    "note": "This is a subset of surahs commonly recited. Full Quran contains 114 surahs."
+  }
+}
