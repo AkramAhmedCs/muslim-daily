@@ -4,12 +4,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../theme';
 import { Card, ArabicText, SourceReference } from '../components';
+import { useLanguage } from '../context';
 
 // Import the expanded hadith data
 import hadithData from '../../data/hadith.json';
 
 const HadithScreen = ({ navigation }) => {
   const { theme } = useTheme();
+  const { language, bilingualMode, t } = useLanguage();
   const insets = useSafeAreaInsets();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [selectedHadith, setSelectedHadith] = useState(null);
@@ -56,10 +58,14 @@ const HadithScreen = ({ navigation }) => {
               <Ionicons name={getCollectionIcon(collection.id)} size={28} color={theme.primary} />
             </View>
             <View style={styles.collectionInfo}>
-              <Text style={[styles.collectionName, { color: theme.text }]}>{collection.name}</Text>
-              <Text style={[styles.collectionArabic, { color: theme.arabicText }]}>{collection.arabicName}</Text>
+              <Text style={[styles.collectionName, { color: theme.text }]}>
+                {language === 'ar' ? collection.arabicName : collection.name}
+              </Text>
+              {(bilingualMode || language === 'ar') && <Text style={[styles.collectionArabic, { color: theme.arabicText }]}>{collection.arabicName}</Text>}
+              {(bilingualMode && language === 'ar') && <Text style={[styles.collectionMeta, { color: theme.textSecondary }]}>{collection.name}</Text>}
+
               <Text style={[styles.collectionMeta, { color: theme.textSecondary }]}>
-                {collection.compiler} • {collection.hadith.length} hadith
+                {collection.compiler} • {collection.hadith.length} {t('hadith')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={theme.textSecondary} />
@@ -102,17 +108,38 @@ const HadithScreen = ({ navigation }) => {
                   <Card style={styles.hadithCard}>
                     <View style={styles.hadithPreview}>
                       <Text style={[styles.hadithNumber, { color: theme.primary }]}>
-                        #{hadith.hadithNumber}
+                        #{hadith.reference}
                       </Text>
-                      <Text
-                        style={[styles.hadithText, { color: theme.text }]}
-                        numberOfLines={2}
-                      >
-                        {hadith.english}
-                      </Text>
-                      <Text style={[styles.narratorName, { color: theme.textSecondary }]}>
-                        — {hadith.narrator}
-                      </Text>
+
+                      {(language === 'ar' || bilingualMode) && (
+                        <Text
+                          style={[styles.hadithText, {
+                            color: theme.text,
+                            textAlign: 'right',
+                            writingDirection: 'rtl',
+                            fontFamily: 'Amiri-Regular'
+                          }]}
+                          numberOfLines={2}
+                        >
+                          {hadith.textAr}
+                        </Text>
+                      )}
+
+                      {/* English preview if English or Bilingual */}
+                      {(language === 'en' || bilingualMode) && (
+                        <Text
+                          style={[styles.hadithText, { color: theme.text, marginTop: 4 }]}
+                          numberOfLines={2}
+                        >
+                          {hadith.textEn}
+                        </Text>
+                      )}
+
+                      {hadith.notes && (
+                        <Text style={[styles.narratorName, { color: theme.textSecondary }]}>
+                          — {hadith.notes.split('Narrated by')[1] || hadith.notes}
+                        </Text>
+                      )}
                     </View>
                     <Ionicons name="chevron-forward" size={16} color={theme.textSecondary} />
                   </Card>
@@ -135,7 +162,7 @@ const HadithScreen = ({ navigation }) => {
             <Ionicons name="arrow-back" size={24} color={theme.text} />
           </Pressable>
           <View style={styles.headerInfo}>
-            <Text style={[styles.detailTitle, { color: theme.text }]}>Hadith #{selectedHadith.hadithNumber}</Text>
+            <Text style={[styles.detailTitle, { color: theme.text }]}>{t('hadith')} #{selectedHadith.reference}</Text>
             <Text style={[styles.detailSubtitle, { color: theme.textSecondary }]}>
               {selectedHadith.bookName}
             </Text>
@@ -144,29 +171,37 @@ const HadithScreen = ({ navigation }) => {
 
         <ScrollView style={styles.hadithDetailScroll} contentContainerStyle={styles.hadithDetailContent}>
           <Card style={styles.fullHadithCard}>
-            <ArabicText size="regular" style={styles.arabicHadith}>
-              {selectedHadith.arabic}
-            </ArabicText>
+            {(language === 'ar' || bilingualMode) && (
+              <ArabicText size="regular" style={styles.arabicHadith}>
+                {selectedHadith.textAr}
+              </ArabicText>
+            )}
 
-            <View style={[styles.divider, { backgroundColor: theme.border }]} />
+            {(bilingualMode && <View style={[styles.divider, { backgroundColor: theme.border }]} />)}
 
-            <Text style={[styles.englishHadith, { color: theme.text }]}>
-              {selectedHadith.english}
-            </Text>
+            {(language === 'en' || bilingualMode) && (
+              <Text style={[styles.englishHadith, { color: theme.text }]}>
+                {selectedHadith.textEn}
+              </Text>
+            )}
 
             <View style={[styles.sourceBox, { backgroundColor: theme.background }]}>
-              <Text style={[styles.narratorLabel, { color: theme.textSecondary }]}>Narrated by:</Text>
-              <Text style={[styles.narratorValue, { color: theme.text }]}>{selectedHadith.narrator}</Text>
+              {selectedHadith.notes && (
+                <>
+                  <Text style={[styles.narratorLabel, { color: theme.textSecondary }]}>Note/Narrator:</Text>
+                  <Text style={[styles.narratorValue, { color: theme.text }]}>{selectedHadith.notes}</Text>
+                </>
+              )}
 
-              <Text style={[styles.sourceLabel, { color: theme.textSecondary }]}>Source:</Text>
+              <Text style={[styles.sourceLabel, { color: theme.textSecondary }]}>{t('sources')}:</Text>
               <Text style={[styles.sourceValue, { color: theme.text }]}>
-                {selectedCollection.name}, Hadith #{selectedHadith.hadithNumber}
+                {language === 'ar' ? selectedCollection.arabicName : selectedCollection.name}, {t('hadith')} #{selectedHadith.reference}
               </Text>
 
               <Text style={[styles.gradeLabel, { color: theme.textSecondary }]}>Grade:</Text>
               <View style={[styles.gradeBadge, { backgroundColor: theme.success + '20' }]}>
                 <Text style={[styles.gradeText, { color: theme.success }]}>
-                  {selectedCollection.grade}
+                  {selectedHadith.authenticity || selectedCollection.grade}
                 </Text>
               </View>
             </View>

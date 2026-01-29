@@ -333,13 +333,13 @@ export const incrementQuranStats = async ({ time = 0, pages = 0, verses = 0 }) =
   try {
     const stats = await getQuranStats();
 
-    stats.dailyTime += time;
-    stats.dailyPages = Math.floor(stats.dailyPages + pages);
-    stats.dailyVerses += verses;
+    stats.dailyTime += time; // Time is seconds (integer)
+    stats.dailyPages = Math.floor(stats.dailyPages) + Math.floor(pages);
+    stats.dailyVerses = Math.floor(stats.dailyVerses) + Math.floor(verses);
 
     stats.totalTime += time;
-    stats.totalPages = Math.floor(stats.totalPages + pages);
-    stats.totalVerses += verses;
+    stats.totalPages = Math.floor(stats.totalPages) + Math.floor(pages);
+    stats.totalVerses = Math.floor(stats.totalVerses) + Math.floor(verses);
 
     stats.lastReadDate = getTodayString();
 

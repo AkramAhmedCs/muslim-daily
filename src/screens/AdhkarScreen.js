@@ -9,11 +9,13 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../theme';
+import { useLanguage } from '../context';
 import { Card } from '../components';
 import adhkarData from '../../data/adhkar.json';
 
 const AdhkarScreen = ({ navigation }) => {
   const { theme } = useTheme();
+  const { language, bilingualMode, t } = useLanguage();
   const insets = useSafeAreaInsets();
 
   const getCategoryIcon = (id) => {
@@ -41,14 +43,21 @@ const AdhkarScreen = ({ navigation }) => {
           />
         </View>
         <View style={styles.textContainer}>
-          <Text style={[styles.categoryNameAr, { color: theme.text }]}>
-            {item.nameAr}
-          </Text>
-          <Text style={[styles.categoryNameEn, { color: theme.textSecondary }]}>
-            {item.nameEn}
-          </Text>
+          {(language === 'ar' || bilingualMode) && (
+            <Text style={[styles.categoryNameAr, { color: theme.text }]}>
+              {item.nameAr}
+            </Text>
+          )}
+          {(language === 'en' || bilingualMode) && (
+            <Text style={[
+              language === 'en' ? styles.categoryNameAr : styles.categoryNameEn,
+              { color: language === 'en' ? theme.text : theme.textSecondary }
+            ]}>
+              {item.nameEn}
+            </Text>
+          )}
           <Text style={[styles.categoryCount, { color: theme.textSecondary }]}>
-            {item.adhkar.length} adhkar
+            {item.adhkar.length} {t('adhkar')}
           </Text>
         </View>
         <Ionicons name="chevron-forward" size={24} color={theme.textSecondary} />
@@ -59,9 +68,9 @@ const AdhkarScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <Text style={[styles.title, { color: theme.text }]}>Adhkar</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t('adhkar')}</Text>
         <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          Remembrance of Allah from Hisn al-Muslim
+          {language === 'ar' ? 'أذكار من حصن المسلم' : 'Remembrance of Allah from Hisn al-Muslim'}
         </Text>
       </View>
 

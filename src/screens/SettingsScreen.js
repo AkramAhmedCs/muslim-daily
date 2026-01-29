@@ -10,7 +10,7 @@ import { sendTestNotification, scheduleAllReminders } from './../../src/services
 
 const SettingsScreen = () => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const { language, toggleLanguage, t } = useLanguage();
+  const { language, toggleLanguage, bilingualMode, toggleBilingualMode, t } = useLanguage();
   const insets = useSafeAreaInsets();
   const [settings, setSettings] = useState({});
   const [testingNotification, setTestingNotification] = useState(false);
@@ -117,6 +117,13 @@ const SettingsScreen = () => {
             <Text style={styles.langBadgeText}>{language.toUpperCase()}</Text>
           </View>
         </Pressable>
+        <SettingRow
+          icon="book-outline"
+          title={t('bilingualMode')}
+          subtitle={t('bilingualDesc')}
+          value={bilingualMode}
+          onToggle={toggleBilingualMode}
+        />
       </Card>
 
       <Card style={styles.section}>
@@ -142,10 +149,7 @@ const SettingsScreen = () => {
         </Pressable>
       </Card>
 
-      <Card style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Display</Text>
-        <SettingRow icon="language-outline" title="Show Translation" value={settings.showTranslation} onToggle={() => handleToggle('showTranslation')} />
-      </Card>
+
 
       <Card style={styles.section}>
         <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Data Management</Text>

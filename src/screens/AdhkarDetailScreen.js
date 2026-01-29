@@ -6,20 +6,23 @@ import {
   StyleSheet,
   Pressable
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../theme';
 import { Card, ArabicText, SourceReference, Counter } from '../components';
+import { useLanguage } from '../context';
 import { getAdhkarProgress, updateAdhkarProgress, resetAdhkarProgress } from '../services';
 
 const AdhkarDetailScreen = ({ route, navigation }) => {
   const { theme } = useTheme();
+  const { language, bilingualMode, t } = useLanguage();
   const { category } = route.params;
   const [progress, setProgress] = useState({});
   const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
     navigation.setOptions({
-      title: category.nameEn,
+      title: language === 'ar' ? category.nameAr : category.nameEn,
     });
     loadProgress();
   }, []);
@@ -31,6 +34,10 @@ const AdhkarDetailScreen = ({ route, navigation }) => {
 
   const handleIncrement = async (adhkarId, currentCount, target) => {
     if (currentCount >= target) return;
+
+    // Haptic feedback on successful increment
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
     const newCount = currentCount + 1;
     await updateAdhkarProgress(adhkarId, newCount);
     setProgress(prev => ({ ...prev, [adhkarId]: newCount }));
@@ -56,7 +63,15 @@ const AdhkarDetailScreen = ({ route, navigation }) => {
           styles.adhkarCard,
           isComplete && { borderColor: theme.success, borderWidth: 1 }
         ]}
-        onPress={() => setExpandedId(isExpanded ? null : item.id)}
+        onPress={() => {
+          if (isExpanded) {
+            // If expanded, tap increments the counter (UX Requirement)
+            handleIncrement(item.id, currentCount, item.repetitions);
+          } else {
+            // If collapsed, tap expands
+            setExpandedId(item.id);
+          }
+        }}
       >
         <View style={styles.adhkarHeader}>
           <View style={[styles.numberBadge, { backgroundColor: theme.primary + '20' }]}>
@@ -64,28 +79,54 @@ const AdhkarDetailScreen = ({ route, navigation }) => {
               {index + 1}
             </Text>
           </View>
-          {isComplete && (
-            <View style={styles.completeBadge}>
-              <Ionicons name="checkmark-circle" size={20} color={theme.success} />
-            </View>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {isComplete && (
+              <View style={[styles.completeBadge, { marginRight: isExpanded ? 12 : 0 }]}>
+                <Ionicons name="checkmark-circle" size={20} color={theme.success} />
+              </View>
+            )}
+
+            {/* Explicit Close Button for expanded state */}
+            {isExpanded && (
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation();
+                  setExpandedId(null);
+                }}
+                hitSlop={12}
+              >
+                <Ionicons name="close-circle" size={24} color={theme.textSecondary} opacity={0.5} />
+              </Pressable>
+            )}
+          </View>
+        </View>
+
+        {/* Text Display Logic */}
+        <View style={styles.textContainer}>
+          {(language === 'ar' || bilingualMode) && (
+            <ArabicText size="regular" style={styles.arabicText}>
+              {item.textAr}
+            </ArabicText>
+          )}
+
+          {(language === 'en' || bilingualMode) && (
+            <Text style={[styles.translation, {
+              color: theme.textSecondary,
+              marginTop: (language === 'ar' || bilingualMode) ? 12 : 0
+            }]}>
+              {item.textEn}
+            </Text>
           )}
         </View>
 
-        <ArabicText size="regular" style={styles.arabicText}>
-          {item.arabicText}
-        </ArabicText>
-
         {isExpanded && (
           <>
-            <Text style={[styles.translation, { color: theme.textSecondary }]}>
-              {item.englishTranslation}
-            </Text>
-
-            {item.note && (
+            {item.notes && (
               <View style={[styles.noteContainer, { backgroundColor: theme.primary + '10' }]}>
                 <Ionicons name="information-circle" size={16} color={theme.primary} />
                 <Text style={[styles.noteText, { color: theme.primary }]}>
-                  {item.note}
+                  {item.notes}
                 </Text>
               </View>
             )}
@@ -129,7 +170,7 @@ const AdhkarDetailScreen = ({ route, navigation }) => {
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
         <Text style={[styles.titleAr, { color: theme.text }]}>
-          {category.nameAr}
+          {language === 'ar' ? category.nameAr : category.nameEn}
         </Text>
         <Text style={[styles.description, { color: theme.textSecondary }]}>
           {category.description}

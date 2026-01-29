@@ -13,6 +13,9 @@ import {
   DuaScreen,
   QuranScreen,
   SettingsScreen,
+  PrayerTimesScreen,
+  PrayerCalendarScreen,
+  PrayerSettingsScreen,
 } from '../screens';
 
 const Tab = createBottomTabNavigator();
@@ -46,6 +49,7 @@ const CustomTabBar = ({ state, descriptors, navigation, theme }) => {
           Hadith: 'library',
           Dua: 'hand-left',
           Quran: 'reader',
+          PrayerTimes: 'time',
           Settings: 'settings',
         };
 
@@ -114,16 +118,32 @@ const AppNavigator = () => {
         <Tab.Screen name="Adhkar" component={AdhkarScreen} />
         <Tab.Screen name="Hadith" component={HadithScreen} />
         <Tab.Screen name="Dua" component={DuaScreen} />
+        <Tab.Screen name="PrayerTimes" component={PrayerTimesScreen} options={{ title: 'Prayer' }} />
         <Tab.Screen name="Quran" component={QuranScreen} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
 
-        {/* AdhkarDetail as a hidden Tab to support navigation without Stack */}
         <Tab.Screen
           name="AdhkarDetail"
           component={AdhkarDetailScreen}
           options={{
             tabBarButton: () => null,
             tabBarStyle: { display: 'none' } // Hide tab bar on details
+          }}
+        />
+        <Tab.Screen
+          name="PrayerCalendar"
+          component={PrayerCalendarScreen}
+          options={{
+            tabBarButton: () => null,
+            tabBarStyle: { display: 'none' }
+          }}
+        />
+        <Tab.Screen
+          name="PrayerSettings"
+          component={PrayerSettingsScreen}
+          options={{
+            tabBarButton: () => null,
+            tabBarStyle: { display: 'none' }
           }}
         />
       </Tab.Navigator>

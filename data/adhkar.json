@@ -7,102 +7,148 @@
       "description": "To be recited after Fajr prayer",
       "adhkar": [
         {
-          "id": 1,
-          "arabicText": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَـهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ. رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
-          "englishTranslation": "We have reached the morning and at this very time all sovereignty belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise, and He is over all things omnipotent. My Lord, I ask You for the good of this day and the good of what follows it, and I seek refuge in You from the evil of this day and the evil of what follows it. My Lord, I seek refuge in You from laziness and senility. My Lord, I seek refuge in You from torment in the Fire and punishment in the grave.",
+          "id": "1",
+          "type": "adhkar",
+          "textAr": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَـهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ. رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
+          "textEn": "We have reached the morning and at this very time all sovereignty belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise, and He is over all things omnipotent. My Lord, I ask You for the good of this day and the good of what follows it, and I seek refuge in You from the evil of this day and the evil of what follows it. My Lord, I seek refuge in You from laziness and senility. My Lord, I seek refuge in You from torment in the Fire and punishment in the grave.",
           "source": "Hisn al-Muslim",
-          "reference": "#75",
-          "repetitions": 1
+          "reference": "75",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 2,
-          "arabicText": "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ",
-          "englishTranslation": "O Allah, by Your leave we have reached the morning and by Your leave we have reached the evening, by Your leave we live and die and unto You is our resurrection.",
+          "id": "2",
+          "type": "adhkar",
+          "textAr": "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ",
+          "textEn": "O Allah, by Your leave we have reached the morning and by Your leave we have reached the evening, by Your leave we live and die and unto You is our resurrection.",
           "source": "Hisn al-Muslim",
-          "reference": "#76",
-          "repetitions": 1
+          "reference": "76",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 3,
-          "arabicText": "اللَّهُمَّ أَنْتَ رَبِّي لاَ إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ",
-          "englishTranslation": "O Allah, You are my Lord, none has the right to be worshipped except You. You created me and I am Your servant, and I abide by Your covenant and promise as best I can. I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me and I acknowledge my sin, so forgive me, for verily none can forgive sins except You.",
+          "id": "3",
+          "type": "adhkar",
+          "textAr": "اللَّهُمَّ أَنْتَ رَبِّي لاَ إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ",
+          "textEn": "O Allah, You are my Lord, none has the right to be worshipped except You. You created me and I am Your servant, and I abide by Your covenant and promise as best I can. I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me and I acknowledge my sin, so forgive me, for verily none can forgive sins except You.",
           "source": "Hisn al-Muslim",
-          "reference": "#77",
-          "note": "Sayyid al-Istighfar (The Master of Seeking Forgiveness)",
-          "repetitions": 1
+          "reference": "77",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": "Sayyid al-Istighfar (The Master of Seeking Forgiveness)"
         },
         {
-          "id": 4,
-          "arabicText": "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لاَ إِلَهَ إِلاَّ أَنْتَ. اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ القَبْرِ، لاَ إِلَهَ إِلاَّ أَنْتَ",
-          "englishTranslation": "O Allah, grant my body health. O Allah, grant my hearing health. O Allah, grant my sight health. None has the right to be worshipped except You. O Allah, I seek refuge in You from disbelief and poverty, and I seek refuge in You from the punishment of the grave. None has the right to be worshipped except You.",
+          "id": "4",
+          "type": "adhkar",
+          "textAr": "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لاَ إِلَهَ إِلاَّ أَنْتَ. اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ القَبْرِ، لاَ إِلَهَ إِلاَّ أَنْتَ",
+          "textEn": "O Allah, grant my body health. O Allah, grant my hearing health. O Allah, grant my sight health. None has the right to be worshipped except You. O Allah, I seek refuge in You from disbelief and poverty, and I seek refuge in You from the punishment of the grave. None has the right to be worshipped except You.",
           "source": "Hisn al-Muslim",
-          "reference": "#78",
-          "repetitions": 3
+          "reference": "78",
+          "repetitions": 3,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 5,
-          "arabicText": "حَسْبِيَ اللهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
-          "englishTranslation": "Allah is Sufficient for me, none has the right to be worshipped except Him, upon Him I rely and He is Lord of the exalted throne.",
+          "id": "5",
+          "type": "adhkar",
+          "textAr": "حَسْبِيَ اللهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+          "textEn": "Allah is Sufficient for me, none has the right to be worshipped except Him, upon Him I rely and He is Lord of the exalted throne.",
           "source": "Hisn al-Muslim",
-          "reference": "#79",
-          "repetitions": 7
+          "reference": "79",
+          "repetitions": 7,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 6,
-          "arabicText": "بِسْمِ اللهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
-          "englishTranslation": "In the name of Allah with whose name nothing is harmed on earth nor in the heavens and He is The All-Hearing, The All-Knowing.",
+          "id": "6",
+          "type": "adhkar",
+          "textAr": "بِسْمِ اللهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+          "textEn": "In the name of Allah with whose name nothing is harmed on earth nor in the heavens and He is The All-Hearing, The All-Knowing.",
           "source": "Hisn al-Muslim",
-          "reference": "#80",
-          "repetitions": 3
+          "reference": "80",
+          "repetitions": 3,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 7,
-          "arabicText": "رَضِيتُ بِاللهِ رَبّاً، وَبِالْإِسْلاَمِ دِيناً، وَبِمُحَمَّدٍ صَلَى اللهُ عَلَيْهِ وَسَلَّمَ نَبِيّاً",
-          "englishTranslation": "I am pleased with Allah as a Lord, and Islam as a religion and Muhammad (peace be upon him) as a Prophet.",
+          "id": "7",
+          "type": "adhkar",
+          "textAr": "رَضِيتُ بِاللهِ رَبّاً، وَبِالْإِسْلاَمِ دِيناً، وَبِمُحَمَّدٍ صَلَى اللهُ عَلَيْهِ وَسَلَّمَ نَبِيّاً",
+          "textEn": "I am pleased with Allah as a Lord, and Islam as a religion and Muhammad (peace be upon him) as a Prophet.",
           "source": "Hisn al-Muslim",
-          "reference": "#81",
-          "repetitions": 3
+          "reference": "81",
+          "repetitions": 3,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 8,
-          "arabicText": "سُبْحَانَ اللهِ وَبِحَمْدِهِ",
-          "englishTranslation": "How perfect Allah is and I praise Him.",
+          "id": "8",
+          "type": "adhkar",
+          "textAr": "سُبْحَانَ اللهِ وَبِحَمْدِهِ",
+          "textEn": "How perfect Allah is and I praise Him.",
           "source": "Hisn al-Muslim",
-          "reference": "#82",
-          "repetitions": 100
+          "reference": "82",
+          "repetitions": 100,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 9,
-          "arabicText": "لاَ إِلَهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
-          "englishTranslation": "None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise and He is over all things omnipotent.",
+          "id": "9",
+          "type": "adhkar",
+          "textAr": "لاَ إِلَهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+          "textEn": "None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise and He is over all things omnipotent.",
           "source": "Hisn al-Muslim",
-          "reference": "#83",
-          "repetitions": 10
+          "reference": "83",
+          "repetitions": 10,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 10,
-          "arabicText": "سُبْحَانَ اللهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ",
-          "englishTranslation": "How perfect Allah is and I praise Him by the number of His creation and His pleasure, and by the weight of His throne, and the ink of His words.",
+          "id": "10",
+          "type": "adhkar",
+          "textAr": "سُبْحَانَ اللهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ",
+          "textEn": "How perfect Allah is and I praise Him by the number of His creation and His pleasure, and by the weight of His throne, and the ink of His words.",
           "source": "Hisn al-Muslim",
-          "reference": "#84",
-          "repetitions": 3
+          "reference": "84",
+          "repetitions": 3,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 11,
-          "arabicText": "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْماً نَافِعاً، وَرِزْقاً طَيِّباً، وَعَمَلاً مُتَقَبَّلاً",
-          "englishTranslation": "O Allah, I ask You for knowledge which is beneficial, and sustenance which is good, and deeds which are accepted.",
+          "id": "11",
+          "type": "adhkar",
+          "textAr": "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْماً نَافِعاً، وَرِزْقاً طَيِّباً، وَعَمَلاً مُتَقَبَّلاً",
+          "textEn": "O Allah, I ask You for knowledge which is beneficial, and sustenance which is good, and deeds which are accepted.",
           "source": "Hisn al-Muslim",
-          "reference": "#85",
-          "note": "To be said after Fajr prayer",
-          "repetitions": 1
+          "reference": "85",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": "To be said after Fajr prayer"
         },
         {
-          "id": 12,
-          "arabicText": "أَسْتَغْفِرُ اللهَ وَأَتُوبُ إِلَيْهِ",
-          "englishTranslation": "I seek Allah's forgiveness and I turn to Him in repentance.",
+          "id": "12",
+          "type": "adhkar",
+          "textAr": "أَسْتَغْفِرُ اللهَ وَأَتُوبُ إِلَيْهِ",
+          "textEn": "I seek Allah's forgiveness and I turn to Him in repentance.",
           "source": "Hisn al-Muslim",
-          "reference": "#86",
-          "repetitions": 100
+          "reference": "86",
+          "repetitions": 100,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         }
       ]
     },
@@ -113,77 +159,112 @@
       "description": "To be recited after Maghrib prayer",
       "adhkar": [
         {
-          "id": 13,
-          "arabicText": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَـهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ. رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
-          "englishTranslation": "We have reached the evening and at this very time all sovereignty belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise, and He is over all things omnipotent. My Lord, I ask You for the good of this night and the good of what follows it, and I seek refuge in You from the evil of this night and the evil of what follows it. My Lord, I seek refuge in You from laziness and senility. My Lord, I seek refuge in You from torment in the Fire and punishment in the grave.",
+          "id": "13",
+          "type": "adhkar",
+          "textAr": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَـهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ. رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
+          "textEn": "We have reached the evening and at this very time all sovereignty belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise, and He is over all things omnipotent. My Lord, I ask You for the good of this night and the good of what follows it, and I seek refuge in You from the evil of this night and the evil of what follows it. My Lord, I seek refuge in You from laziness and senility. My Lord, I seek refuge in You from torment in the Fire and punishment in the grave.",
           "source": "Hisn al-Muslim",
-          "reference": "#87",
-          "repetitions": 1
+          "reference": "87",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 14,
-          "arabicText": "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ",
-          "englishTranslation": "O Allah, by Your leave we have reached the evening and by Your leave we have reached the morning, by Your leave we live and die and unto You is our return.",
+          "id": "14",
+          "type": "adhkar",
+          "textAr": "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ",
+          "textEn": "O Allah, by Your leave we have reached the evening and by Your leave we have reached the morning, by Your leave we live and die and unto You is our return.",
           "source": "Hisn al-Muslim",
-          "reference": "#88",
-          "repetitions": 1
+          "reference": "88",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 15,
-          "arabicText": "اللَّهُمَّ أَنْتَ رَبِّي لاَ إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ",
-          "englishTranslation": "O Allah, You are my Lord, none has the right to be worshipped except You. You created me and I am Your servant, and I abide by Your covenant and promise as best I can. I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me and I acknowledge my sin, so forgive me, for verily none can forgive sins except You.",
+          "id": "15",
+          "type": "adhkar",
+          "textAr": "اللَّهُمَّ أَنْتَ رَبِّي لاَ إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ",
+          "textEn": "O Allah, You are my Lord, none has the right to be worshipped except You. You created me and I am Your servant, and I abide by Your covenant and promise as best I can. I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me and I acknowledge my sin, so forgive me, for verily none can forgive sins except You.",
           "source": "Hisn al-Muslim",
-          "reference": "#89",
-          "note": "Sayyid al-Istighfar (The Master of Seeking Forgiveness)",
-          "repetitions": 1
+          "reference": "89",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": "Sayyid al-Istighfar (The Master of Seeking Forgiveness)"
         },
         {
-          "id": 16,
-          "arabicText": "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لاَ إِلَهَ إِلاَّ أَنْتَ. اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ القَبْرِ، لاَ إِلَهَ إِلاَّ أَنْتَ",
-          "englishTranslation": "O Allah, grant my body health. O Allah, grant my hearing health. O Allah, grant my sight health. None has the right to be worshipped except You. O Allah, I seek refuge in You from disbelief and poverty, and I seek refuge in You from the punishment of the grave. None has the right to be worshipped except You.",
+          "id": "16",
+          "type": "adhkar",
+          "textAr": "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لاَ إِلَهَ إِلاَّ أَنْتَ. اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ القَبْرِ، لاَ إِلَهَ إِلاَّ أَنْتَ",
+          "textEn": "O Allah, grant my body health. O Allah, grant my hearing health. O Allah, grant my sight health. None has the right to be worshipped except You. O Allah, I seek refuge in You from disbelief and poverty, and I seek refuge in You from the punishment of the grave. None has the right to be worshipped except You.",
           "source": "Hisn al-Muslim",
-          "reference": "#90",
-          "repetitions": 3
+          "reference": "90",
+          "repetitions": 3,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 17,
-          "arabicText": "حَسْبِيَ اللهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
-          "englishTranslation": "Allah is Sufficient for me, none has the right to be worshipped except Him, upon Him I rely and He is Lord of the exalted throne.",
+          "id": "17",
+          "type": "adhkar",
+          "textAr": "حَسْبِيَ اللهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+          "textEn": "Allah is Sufficient for me, none has the right to be worshipped except Him, upon Him I rely and He is Lord of the exalted throne.",
           "source": "Hisn al-Muslim",
-          "reference": "#91",
-          "repetitions": 7
+          "reference": "91",
+          "repetitions": 7,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 18,
-          "arabicText": "بِسْمِ اللهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
-          "englishTranslation": "In the name of Allah with whose name nothing is harmed on earth nor in the heavens and He is The All-Hearing, The All-Knowing.",
+          "id": "18",
+          "type": "adhkar",
+          "textAr": "بِسْمِ اللهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+          "textEn": "In the name of Allah with whose name nothing is harmed on earth nor in the heavens and He is The All-Hearing, The All-Knowing.",
           "source": "Hisn al-Muslim",
-          "reference": "#92",
-          "repetitions": 3
+          "reference": "92",
+          "repetitions": 3,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 19,
-          "arabicText": "رَضِيتُ بِاللهِ رَبّاً، وَبِالْإِسْلاَمِ دِيناً، وَبِمُحَمَّدٍ صَلَى اللهُ عَلَيْهِ وَسَلَّمَ نَبِيّاً",
-          "englishTranslation": "I am pleased with Allah as a Lord, and Islam as a religion and Muhammad (peace be upon him) as a Prophet.",
+          "id": "19",
+          "type": "adhkar",
+          "textAr": "رَضِيتُ بِاللهِ رَبّاً، وَبِالْإِسْلاَمِ دِيناً، وَبِمُحَمَّدٍ صَلَى اللهُ عَلَيْهِ وَسَلَّمَ نَبِيّاً",
+          "textEn": "I am pleased with Allah as a Lord, and Islam as a religion and Muhammad (peace be upon him) as a Prophet.",
           "source": "Hisn al-Muslim",
-          "reference": "#93",
-          "repetitions": 3
+          "reference": "93",
+          "repetitions": 3,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 20,
-          "arabicText": "أَعُوذُ بِكَلِمَاتِ اللهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
-          "englishTranslation": "I take refuge in Allah's perfect words from the evil He has created.",
+          "id": "20",
+          "type": "adhkar",
+          "textAr": "أَعُوذُ بِكَلِمَاتِ اللهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+          "textEn": "I take refuge in Allah's perfect words from the evil He has created.",
           "source": "Hisn al-Muslim",
-          "reference": "#94",
-          "repetitions": 3
+          "reference": "94",
+          "repetitions": 3,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 21,
-          "arabicText": "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
-          "englishTranslation": "O Allah, send prayers and peace upon our Prophet Muhammad.",
+          "id": "21",
+          "type": "adhkar",
+          "textAr": "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
+          "textEn": "O Allah, send prayers and peace upon our Prophet Muhammad.",
           "source": "Hisn al-Muslim",
-          "reference": "#95",
-          "repetitions": 10
+          "reference": "95",
+          "repetitions": 10,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         }
       ]
     },
@@ -194,69 +275,100 @@
       "description": "To be recited after each obligatory prayer",
       "adhkar": [
         {
-          "id": 22,
-          "arabicText": "أَسْتَغْفِرُ اللهَ، أَسْتَغْفِرُ اللهَ، أَسْتَغْفِرُ اللهَ",
-          "englishTranslation": "I seek Allah's forgiveness. I seek Allah's forgiveness. I seek Allah's forgiveness.",
+          "id": "22",
+          "type": "adhkar",
+          "textAr": "أَسْتَغْفِرُ اللهَ، أَسْتَغْفِرُ اللهَ، أَسْتَغْفِرُ اللهَ",
+          "textEn": "I seek Allah's forgiveness. I seek Allah's forgiveness. I seek Allah's forgiveness.",
           "source": "Hisn al-Muslim",
-          "reference": "#96",
-          "repetitions": 3
+          "reference": "96",
+          "repetitions": 3,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 23,
-          "arabicText": "اللَّهُمَّ أَنْتَ السَّلاَمُ، وَمِنْكَ السَّلاَمُ، تَبَارَكْتَ يَا ذَا الجَلاَلِ وَالإِكْرَامِ",
-          "englishTranslation": "O Allah, You are peace and from You is peace, blessed are You, O Possessor of majesty and honor.",
+          "id": "23",
+          "type": "adhkar",
+          "textAr": "اللَّهُمَّ أَنْتَ السَّلاَمُ، وَمِنْكَ السَّلاَمُ، تَبَارَكْتَ يَا ذَا الجَلاَلِ وَالإِكْرَامِ",
+          "textEn": "O Allah, You are peace and from You is peace, blessed are You, O Possessor of majesty and honor.",
           "source": "Hisn al-Muslim",
-          "reference": "#97",
-          "repetitions": 1
+          "reference": "97",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 24,
-          "arabicText": "لاَ إِلَهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، اللَّهُمَّ لاَ مَانِعَ لِمَا أَعْطَيْتَ، وَلاَ مُعْطِيَ لِمَا مَنَعْتَ، وَلاَ يَنْفَعُ ذَا الجَدِّ مِنْكَ الجَدُّ",
-          "englishTranslation": "None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise and He is over all things omnipotent. O Allah, none can prevent what You have willed to bestow and none can bestow what You have willed to prevent, and no wealth or majesty can benefit anyone, as from You is all wealth and majesty.",
+          "id": "24",
+          "type": "adhkar",
+          "textAr": "لاَ إِلَهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، اللَّهُمَّ لاَ مَانِعَ لِمَا أَعْطَيْتَ، وَلاَ مُعْطِيَ لِمَا مَنَعْتَ، وَلاَ يَنْفَعُ ذَا الجَدِّ مِنْكَ الجَدُّ",
+          "textEn": "None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise and He is over all things omnipotent. O Allah, none can prevent what You have willed to bestow and none can bestow what You have willed to prevent, and no wealth or majesty can benefit anyone, as from You is all wealth and majesty.",
           "source": "Hisn al-Muslim",
-          "reference": "#98",
-          "repetitions": 1
+          "reference": "98",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 25,
-          "arabicText": "سُبْحَانَ اللهِ",
-          "englishTranslation": "How perfect Allah is.",
+          "id": "25",
+          "type": "adhkar",
+          "textAr": "سُبْحَانَ اللهِ",
+          "textEn": "How perfect Allah is.",
           "source": "Hisn al-Muslim",
-          "reference": "#99",
-          "repetitions": 33
+          "reference": "99",
+          "repetitions": 33,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 26,
-          "arabicText": "الْحَمْدُ لِلَّهِ",
-          "englishTranslation": "All praise is for Allah.",
+          "id": "26",
+          "type": "adhkar",
+          "textAr": "الْحَمْدُ لِلَّهِ",
+          "textEn": "All praise is for Allah.",
           "source": "Hisn al-Muslim",
-          "reference": "#100",
-          "repetitions": 33
+          "reference": "100",
+          "repetitions": 33,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 27,
-          "arabicText": "اللهُ أَكْبَرُ",
-          "englishTranslation": "Allah is the greatest.",
+          "id": "27",
+          "type": "adhkar",
+          "textAr": "اللهُ أَكْبَرُ",
+          "textEn": "Allah is the greatest.",
           "source": "Hisn al-Muslim",
-          "reference": "#101",
-          "repetitions": 33
+          "reference": "101",
+          "repetitions": 33,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 28,
-          "arabicText": "لاَ إِلَهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
-          "englishTranslation": "None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise and He is over all things omnipotent.",
+          "id": "28",
+          "type": "adhkar",
+          "textAr": "لاَ إِلَهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+          "textEn": "None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise and He is over all things omnipotent.",
           "source": "Hisn al-Muslim",
-          "reference": "#102",
-          "note": "After completing the 33 repetitions of each",
-          "repetitions": 1
+          "reference": "102",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": "After completing the 33 repetitions of each"
         },
         {
-          "id": 29,
-          "arabicText": "آيَةُ الْكُرْسِيِّ: اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الأَرْضِ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلاَ يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلاَّ بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالأَرْضَ وَلاَ يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ",
-          "englishTranslation": "Ayat al-Kursi: Allah! There is no deity except Him, the Ever-Living, the Sustainer of existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great.",
+          "id": "29",
+          "type": "adhkar",
+          "textAr": "آيَةُ الْكُرْسِيِّ: اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الأَرْضِ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلاَ يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلاَّ بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالأَرْضَ وَلاَ يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ",
+          "textEn": "Ayat al-Kursi: Allah! There is no deity except Him, the Ever-Living, the Sustainer of existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great.",
           "source": "Hisn al-Muslim",
-          "reference": "#103 (Quran 2:255)",
-          "repetitions": 1
+          "reference": "103 (Quran 2:255)",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         }
       ]
     },
@@ -267,52 +379,76 @@
       "description": "To be recited before going to sleep",
       "adhkar": [
         {
-          "id": 30,
-          "arabicText": "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
-          "englishTranslation": "In Your name O Allah, I die and I live.",
+          "id": "30",
+          "type": "adhkar",
+          "textAr": "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+          "textEn": "In Your name O Allah, I die and I live.",
           "source": "Hisn al-Muslim",
-          "reference": "#104",
-          "repetitions": 1
+          "reference": "104",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 31,
-          "arabicText": "اللَّهُمَّ بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ",
-          "englishTranslation": "In Your name my Lord, I lie down and in Your name I rise, so if You should take my soul then have mercy upon it, and if You should return my soul then protect it in the manner You do so with Your righteous servants.",
+          "id": "31",
+          "type": "adhkar",
+          "textAr": "اللَّهُمَّ بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ",
+          "textEn": "In Your name my Lord, I lie down and in Your name I rise, so if You should take my soul then have mercy upon it, and if You should return my soul then protect it in the manner You do so with Your righteous servants.",
           "source": "Hisn al-Muslim",
-          "reference": "#105",
-          "repetitions": 1
+          "reference": "105",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 32,
-          "arabicText": "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ",
-          "englishTranslation": "O Allah, protect me from Your punishment on the day Your servants are resurrected.",
+          "id": "32",
+          "type": "adhkar",
+          "textAr": "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ",
+          "textEn": "O Allah, protect me from Your punishment on the day Your servants are resurrected.",
           "source": "Hisn al-Muslim",
-          "reference": "#106",
-          "repetitions": 3
+          "reference": "106",
+          "repetitions": 3,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 33,
-          "arabicText": "سُبْحَانَ اللهِ",
-          "englishTranslation": "How perfect Allah is.",
+          "id": "33",
+          "type": "adhkar",
+          "textAr": "سُبْحَانَ اللهِ",
+          "textEn": "How perfect Allah is.",
           "source": "Hisn al-Muslim",
-          "reference": "#107",
-          "repetitions": 33
+          "reference": "107",
+          "repetitions": 33,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 34,
-          "arabicText": "الْحَمْدُ لِلَّهِ",
-          "englishTranslation": "All praise is for Allah.",
+          "id": "34",
+          "type": "adhkar",
+          "textAr": "الْحَمْدُ لِلَّهِ",
+          "textEn": "All praise is for Allah.",
           "source": "Hisn al-Muslim",
-          "reference": "#108",
-          "repetitions": 33
+          "reference": "108",
+          "repetitions": 33,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 35,
-          "arabicText": "اللهُ أَكْبَرُ",
-          "englishTranslation": "Allah is the greatest.",
+          "id": "35",
+          "type": "adhkar",
+          "textAr": "اللهُ أَكْبَرُ",
+          "textEn": "Allah is the greatest.",
           "source": "Hisn al-Muslim",
-          "reference": "#109",
-          "repetitions": 34
+          "reference": "109",
+          "repetitions": 34,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         }
       ]
     },
@@ -323,20 +459,28 @@
       "description": "To be recited upon waking from sleep",
       "adhkar": [
         {
-          "id": 36,
-          "arabicText": "الحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
-          "englishTranslation": "All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection.",
+          "id": "36",
+          "type": "adhkar",
+          "textAr": "الحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
+          "textEn": "All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection.",
           "source": "Hisn al-Muslim",
-          "reference": "#1",
-          "repetitions": 1
+          "reference": "1",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         },
         {
-          "id": 37,
-          "arabicText": "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، ولاَ إِلَهَ إِلاَّ اللَّهُ، وَاللَّهُ أَكْبَرُ، وَلاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ العَلِيِّ الْعَظِيمِ",
-          "englishTranslation": "None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise and He is over all things omnipotent. How perfect Allah is, and all praise is for Allah, and none has the right to be worshipped except Allah, Allah is the greatest, and there is no power nor might except with Allah, The Most High, The Supreme.",
+          "id": "37",
+          "type": "adhkar",
+          "textAr": "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، ولاَ إِلَهَ إِلاَّ اللَّهُ، وَاللَّهُ أَكْبَرُ، وَلاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ العَلِيِّ الْعَظِيمِ",
+          "textEn": "None has the right to be worshipped except Allah, alone, without partner. To Him belongs all sovereignty and praise and He is over all things omnipotent. How perfect Allah is, and all praise is for Allah, and none has the right to be worshipped except Allah, Allah is the greatest, and there is no power nor might except with Allah, The Most High, The Supreme.",
           "source": "Hisn al-Muslim",
-          "reference": "#2",
-          "repetitions": 1
+          "reference": "2",
+          "repetitions": 1,
+          "authenticity": null,
+          "virtue": null,
+          "notes": null
         }
       ]
     }

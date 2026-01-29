@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../theme';
 import { Card, ArabicText, SourceReference } from '../components';
+import { useLanguage } from '../context';
 import duaData from '../../data/dua.json';
 
 // Enable LayoutAnimation on Android
@@ -23,6 +24,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 const DuaScreen = ({ navigation }) => {
   const { theme } = useTheme();
+  const { language, bilingualMode, t } = useLanguage();
   const insets = useSafeAreaInsets();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
@@ -99,14 +101,21 @@ const DuaScreen = ({ navigation }) => {
           />
         </View>
         <View style={styles.textContainer}>
-          <Text style={[styles.categoryNameAr, { color: theme.text }]}>
-            {item.nameAr}
-          </Text>
-          <Text style={[styles.categoryNameEn, { color: theme.textSecondary }]}>
-            {item.nameEn}
-          </Text>
+          {(language === 'ar' || bilingualMode) && (
+            <Text style={[styles.categoryNameAr, { color: theme.text }]}>
+              {item.nameAr}
+            </Text>
+          )}
+          {(language === 'en' || bilingualMode) && (
+            <Text style={[
+              language === 'en' ? styles.categoryNameAr : styles.categoryNameEn,
+              { color: language === 'en' ? theme.text : theme.textSecondary }
+            ]}>
+              {item.nameEn}
+            </Text>
+          )}
           <Text style={[styles.duaCount, { color: theme.textSecondary }]}>
-            {item.duas.length} du'a
+            {item.duas.length} {t('dua')}
           </Text>
         </View>
         <Ionicons name="chevron-forward" size={24} color={theme.textSecondary} />
@@ -128,24 +137,41 @@ const DuaScreen = ({ navigation }) => {
               {index + 1}
             </Text>
           </View>
-          {item.occasion && (
-            <View style={[styles.occasionBadge, { backgroundColor: theme.accent + '20' }]}>
-              <Text style={[styles.occasionText, { color: theme.accent }]} numberOfLines={1}>
-                {item.occasion}
+          {item.notes && (
+            <View style={[styles.occasionBadge, { backgroundColor: theme.primary + '10' }]}>
+              <Text style={[styles.occasionText, { color: theme.primary }]} numberOfLines={1}>
+                {item.notes}
               </Text>
             </View>
           )}
         </View>
 
-        <ArabicText size="regular" style={styles.arabicText}>
-          {item.arabicText}
-        </ArabicText>
+        {/* Text Display Logic */}
+        <View>
+          {(language === 'ar' || bilingualMode) && (
+            <ArabicText size="regular" style={styles.arabicText}>
+              {item.textAr}
+            </ArabicText>
+          )}
+
+          {/* Collapsed Preview for English if only English selected? No, consistent with Adhkar */}
+          {(!isExpanded && language === 'en' && !bilingualMode) && (
+            <Text style={[styles.translation, { color: theme.text, marginBottom: 12 }]} numberOfLines={3}>
+              {item.textEn}
+            </Text>
+          )}
+        </View>
 
         {isExpanded && (
           <>
-            <Text style={[styles.translation, { color: theme.textSecondary }]}>
-              {item.englishTranslation}
-            </Text>
+            {(language === 'en' || bilingualMode) && (
+              <Text style={[styles.translation, {
+                color: theme.textSecondary,
+                marginTop: (language === 'ar' || bilingualMode) ? 0 : 0
+              }]}>
+                {item.textEn}
+              </Text>
+            )}
 
             <SourceReference
               source={item.source}
@@ -187,10 +213,10 @@ const DuaScreen = ({ navigation }) => {
 
         <View style={styles.header}>
           <Text style={[styles.titleAr, { color: theme.text }]}>
-            {selectedCategory.nameAr}
+            {language === 'ar' ? selectedCategory.nameAr : selectedCategory.nameEn}
           </Text>
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-            {selectedCategory.nameEn}
+            {language === 'ar' ? selectedCategory.nameEn : selectedCategory.description}
           </Text>
         </View>
 
@@ -218,9 +244,9 @@ const DuaScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <Text style={[styles.title, { color: theme.text }]}>Du'a</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t('dua')}</Text>
         <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          Supplications for every situation
+          {language === 'ar' ? 'أدعية لكل الحالات' : 'Supplications for every situation'}
         </Text>
       </View>
 

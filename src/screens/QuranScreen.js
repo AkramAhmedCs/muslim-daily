@@ -6,7 +6,7 @@ import { Audio } from 'expo-av';
 import { useTheme } from '../theme';
 import { useLanguage } from '../context';
 import { Card, ArabicText } from '../components';
-import { incrementQuranStats, getQuranStats } from '../services';
+import { incrementQuranStats, getQuranStats, trackPageView } from '../services';
 // Note: No text manipulation imports - Bismillah fix is done at render level
 
 // Import the full Quran data
@@ -200,7 +200,8 @@ const QuranScreen = ({ navigation, onSurahChange }) => {
     if (direction === 'next') {
       if (currentAyahIndex < maxIndex) {
         setCurrentAyahIndex(prev => prev + 1);
-        incrementQuranStats({ pages: 0.1 });
+        // Page tracking is now handled by useEffect & PageTrackingService
+        // incrementQuranStats({ pages: 0.1 });
       } else {
         // At last ayah - try to go to next surah
         navigateToNextSurah();
@@ -235,6 +236,17 @@ const QuranScreen = ({ navigation, onSurahChange }) => {
   // Tracking refs
   const startTimeRef = useRef(null);
   const intervalRef = useRef(null);
+
+  // Track Page View (Unique Pages)
+  useEffect(() => {
+    if (!selectedSurah || !selectedSurah.ayahs) return;
+
+    // Get current ayah's page
+    const ayah = selectedSurah.ayahs[currentAyahIndex];
+    if (ayah && ayah.page) {
+      trackPageView(ayah.page); // Service handles uniqueness/day tracking
+    }
+  }, [selectedSurah, currentAyahIndex]);
 
   // Tracking Logic
   useEffect(() => {
@@ -514,6 +526,9 @@ const QuranScreen = ({ navigation, onSurahChange }) => {
           <Text style={[styles.statsNote, { color: theme.textSecondary }]}>
             Stats update automatically as you read.
           </Text>
+          <Text style={[styles.statsNote, { color: theme.textSecondary, fontSize: 10, marginTop: 4 }]}>
+            Pages calculated from Tanzil.net mushaf mapping.
+          </Text>
         </View>
       </View>
     </Modal>
@@ -704,11 +719,15 @@ const styles = StyleSheet.create({
 
   // Top Navigation Bar
   topNavBar: {
-    height: 100, // Reduced from speculative 60+44 -> adjusted to fit Safe Area
+    // height: 100, // REMOVED fixed height to allow dynamic safe area adjustment
+    minHeight: 60, // Minimum height for touch targets
+    paddingBottom: 12, // Consistent bottom padding
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12
+    paddingHorizontal: 12,
+    // ensure it sits on top of content
+    zIndex: 10,
   },
   topBackBtn: {
     width: 44, height: 44, borderRadius: 22,

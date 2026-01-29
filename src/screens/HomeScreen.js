@@ -12,20 +12,26 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../theme';
+import { useGreeting } from '../hooks/useGreeting';
 import { Card, ChecklistItem } from '../components';
 import { getChecklist, updateChecklist, getStreak } from '../services';
 import adhkarData from '../../data/adhkar.json';
 
 const HomeScreen = ({ navigation }) => {
   const { theme, isDarkMode } = useTheme();
+  const { greeting } = useGreeting();
   const insets = useSafeAreaInsets();
   const [checklist, setChecklist] = useState({});
   const [streak, setStreak] = useState({ current: 0, best: 0 });
   const [refreshing, setRefreshing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Determine if it's morning or evening
+  // Determine if it's morning or evening (for content filtering)
   const hour = currentTime.getHours();
+  // We keep this local logic for content filtering or align it with greeting?
+  // Let's use the greeting text to derive mode if needed, or keep time based logic for simplicity of content.
+  // Actually, let's keep the hour logic for content filtering as it matches the standard "Morning Adhkar" times
+  // independent of the greeting (greeting is social/polite, content is time-specific).
   const isMorning = hour >= 4 && hour < 12;
   const isEvening = hour >= 15 && hour < 22;
 
@@ -72,11 +78,7 @@ const HomeScreen = ({ navigation }) => {
 
   const featuredAdhkar = getFeaturedAdhkar();
 
-  const getGreeting = () => {
-    if (hour >= 4 && hour < 12) return 'صباح الخير';
-    if (hour >= 12 && hour < 17) return 'مساء الخير';
-    return 'مساء النور';
-  };
+
 
   // Calculate completion percentage
   const completedItems = Object.values(checklist).filter(Boolean).length;
@@ -107,7 +109,7 @@ const HomeScreen = ({ navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <Text style={[styles.greeting, { color: theme.textSecondary }]}>
-            {getGreeting()}
+            {greeting}
           </Text>
           <Text style={[styles.title, { color: theme.text }]}>
             Muslim Daily

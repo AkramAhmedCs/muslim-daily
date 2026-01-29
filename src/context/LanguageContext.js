@@ -46,6 +46,35 @@ export const LanguageProvider = ({ children }) => {
     changeLanguage(language === 'en' ? 'ar' : 'en');
   };
 
+  // Bilingual Mode
+  const [bilingualMode, setBilingualMode] = useState(false);
+  const BILINGUAL_KEY = '@app_bilingual';
+
+  useEffect(() => {
+    loadBilingual();
+  }, []);
+
+  const loadBilingual = async () => {
+    try {
+      const saved = await AsyncStorage.getItem(BILINGUAL_KEY);
+      if (saved !== null) {
+        setBilingualMode(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error('Error loading bilingual:', e);
+    }
+  };
+
+  const toggleBilingualMode = async () => {
+    try {
+      const newValue = !bilingualMode;
+      setBilingualMode(newValue);
+      await AsyncStorage.setItem(BILINGUAL_KEY, JSON.stringify(newValue));
+    } catch (e) {
+      console.error('Error saving bilingual:', e);
+    }
+  };
+
   // Translation strings - complete Arabic localization
   const t = (key) => {
     const translations = {
@@ -68,6 +97,8 @@ export const LanguageProvider = ({ children }) => {
       language: language === 'ar' ? 'اللغة' : 'Language',
       arabic: language === 'ar' ? 'العربية' : 'Arabic',
       english: language === 'ar' ? 'الإنجليزية' : 'English',
+      bilingualMode: language === 'ar' ? 'الوضع المزدوج' : 'Bilingual Mode',
+      bilingualDesc: language === 'ar' ? 'عرض العربية والإنجليزية معاً' : 'Show both Arabic and English',
       darkMode: language === 'ar' ? 'الوضع الداكن' : 'Dark Mode',
       appearance: language === 'ar' ? 'المظهر' : 'Appearance',
       reminders: language === 'ar' ? 'التذكيرات' : 'Reminders',
@@ -117,6 +148,8 @@ export const LanguageProvider = ({ children }) => {
         isRTL,
         changeLanguage,
         toggleLanguage,
+        bilingualMode,
+        toggleBilingualMode,
         t,
       }}
     >
