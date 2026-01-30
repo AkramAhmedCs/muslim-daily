@@ -41,8 +41,100 @@ export const initDatabase = async () => {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (page, date_read)
       );
-    `);
+
+    CREATE TABLE IF NOT EXISTS memorization (
+      id TEXT PRIMARY KEY,
+      surah INTEGER NOT NULL,
+      ayah INTEGER NOT NULL,
+      status TEXT CHECK(status IN ('learning','mastered','review')) NOT NULL,
+      nextReviewAt TEXT,
+      intervalDays INTEGER DEFAULT 0,
+      easeFactor REAL DEFAULT 2.5,
+      streak INTEGER DEFAULT 0,
+      createdAt TEXT,
+      updatedAt TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS audio_cache (
+      id TEXT PRIMARY KEY,
+      surah INTEGER,
+      ayah INTEGER,
+      reciter TEXT,
+      url TEXT,
+      localPath TEXT,
+      size INTEGER,
+      downloadedAt TEXT,
+      lastPlayedAt TEXT
+    );
+      `);
+
+  // RUN MIGRATION
+  await migrateMemorizationSchema(db);
+
   console.log('[Database] Initialized');
+};
+
+const migrateMemorizationSchema = async (db) => {
+  try {
+    const tableInfo = await db.getAllAsync(`PRAGMA table_info(memorization)`);
+    const columns = tableInfo.map(c => c.name);
+
+    // Check if migration needed (missing new fields)
+    const hasNewFields = columns.includes('consecutiveCorrect') && columns.includes('totalReps');
+    if (hasNewFields) return;
+
+    console.log('[Database] Migrating memorization table...');
+
+    await db.withTransactionAsync(async () => {
+      // 1. Rename old table
+      await db.execAsync(`ALTER TABLE memorization RENAME TO memorization_old`);
+
+      // 2. Create new table (Strict Schema from spec)
+      await db.execAsync(`
+        CREATE TABLE memorization (
+          id TEXT PRIMARY KEY,
+          surah INTEGER NOT NULL,
+          ayah INTEGER NOT NULL,
+          page INTEGER DEFAULT 0,
+          status TEXT NOT NULL,
+          totalReps INTEGER DEFAULT 0,
+          consecutiveCorrect INTEGER DEFAULT 0,
+          easeFactor REAL DEFAULT 2.5,
+          intervalDays INTEGER DEFAULT 0,
+          nextReviewAt TEXT,
+          lastAttemptAt TEXT,
+          lastGrade INTEGER,
+          createdAt TEXT NOT NULL,
+          updatedAt TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_memorization_next ON memorization(nextReviewAt);
+      `);
+
+      // 3. Migrate Data
+      // Mapping 'streak' -> 'consecutiveCorrect'
+      await db.execAsync(`
+        INSERT INTO memorization (
+          id, surah, ayah, page, status, totalReps, consecutiveCorrect, 
+          easeFactor, intervalDays, nextReviewAt, lastAttemptAt, lastGrade, 
+          createdAt, updatedAt
+        )
+        SELECT 
+          id, surah, ayah, 0, status, 0, IFNULL(streak, 0),
+          easeFactor, intervalDays, nextReviewAt, NULL, NULL,
+          COALESCE(createdAt, datetime('now')), COALESCE(updatedAt, datetime('now'))
+        FROM memorization_old
+      `);
+
+      // 4. Drop old table
+      await db.execAsync(`DROP TABLE memorization_old`);
+    });
+
+    console.log('[Database] Migration successful');
+  } catch (error) {
+    console.error('[Database] Migration failed:', error);
+    // Attempt rollback/recovery handled by transaction, but we log here.
+    // Spec says: "If migration fails, rollback..." - DB transaction handles atomicity.
+  }
 };
 
 export const readQuery = async (sql, params = []) => {

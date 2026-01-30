@@ -1,9 +1,11 @@
 export * from './storage';
-export * from './PrayerTimesService';
-export * from './notifications';
-export * from './backgroundTask';
-export * from './PageTrackingService';
 export * from './DatabaseService';
 export * from './BookmarkService';
+export * from './ReadingSessionService';
+export * from './PageTrackingService';
+export * from './JuzService';
+export * from './PrayerTimesService';
+export * from './MemorizationService'; // NEW
+export * from './AudioService'; // NEW
 export * from './ReadingSessionService';
 export * from './JuzService';

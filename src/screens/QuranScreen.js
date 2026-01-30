@@ -403,6 +403,28 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
                   color={currentBookmarkId ? theme.primary : theme.textSecondary}
                 />
               </Pressable>
+
+              {/* Memorize Button */}
+              <Pressable
+                style={[styles.heartButton, { marginLeft: 16 }]}
+                onPress={async () => {
+                  import('../services').then(async (s) => {
+                    try {
+                      // V2 API is addItem(surah, ayah, page)
+                      await s.addItem(selectedSurah.number, currentAyah.number, currentAyah.page || 0);
+                      alert(`Surah ${selectedSurah.englishName} : Ayah ${currentAyah.number}\nadded to Hifz Journey.`);
+                    } catch (e) {
+                      alert('Error adding: ' + e.message);
+                    }
+                  });
+                }}
+              >
+                <Ionicons
+                  name="school-outline"
+                  size={28}
+                  color={theme.textSecondary}
+                />
+              </Pressable>
             </View>
 
             {showDecorativeHeader && isFirstDisplayableAyah && (

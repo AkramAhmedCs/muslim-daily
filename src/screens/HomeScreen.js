@@ -250,6 +250,22 @@ const HomeScreen = ({ navigation }) => {
             <Ionicons name="reader-outline" size={28} color={theme.primary} />
             <Text style={[styles.quickActionText, { color: theme.text }]}>Quran</Text>
           </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.quickAction,
+              {
+                backgroundColor: theme.background === '#FFFFFF' ? '#FFFFFF' : (theme.background || '#FFFFFF'),
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: theme.border || '#E0E0E0',
+                opacity: pressed ? 0.9 : 1
+              }
+            ]}
+            onPress={() => navigation.navigate('Memorization')}
+          >
+            <Ionicons name="school-outline" size={28} color={theme.primary} />
+            <Text style={[styles.quickActionText, { color: theme.text }]}>Hifz</Text>
+          </Pressable>
         </View>
 
         {/* Daily Checklist */}

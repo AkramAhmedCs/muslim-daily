@@ -17,6 +17,9 @@ import {
   PrayerCalendarScreen,
   PrayerSettingsScreen,
   BookmarksScreen,
+  MemorizationScreen,
+  ReviewSessionScreen,
+  MemorizeFlow,
 } from '../screens';
 
 const Tab = createBottomTabNavigator();
@@ -122,6 +125,35 @@ const AppNavigator = () => {
         <Tab.Screen name="PrayerTimes" component={PrayerTimesScreen} options={{ title: 'Prayer' }} />
         <Tab.Screen name="Quran" component={QuranScreen} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
+
+        {/* Hifz Features */}
+        <Tab.Screen
+          name="Memorization"
+          component={MemorizationScreen}
+          options={{
+            title: 'Hifz Journey',
+            tabBarButton: () => null, // Hide from tab bar
+            tabBarStyle: { display: 'none' }
+          }}
+        />
+        <Tab.Screen
+          name="ReviewSession"
+          component={ReviewSessionScreen}
+          options={{
+            headerShown: false, // Full screen for focus
+            tabBarButton: () => null, // Hide from tab bar
+            tabBarStyle: { display: 'none' }
+          }}
+        />
+        <Tab.Screen
+          name="MemorizeFlow"
+          component={MemorizeFlow}
+          options={{
+            headerShown: false,
+            tabBarButton: () => null, // Hide from tab bar
+            tabBarStyle: { display: 'none' }
+          }}
+        />
 
         <Tab.Screen
           name="AdhkarDetail"

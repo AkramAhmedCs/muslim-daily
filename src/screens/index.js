@@ -9,3 +9,6 @@ export { default as PrayerCalendarScreen } from './PrayerCalendarScreen';
 export { default as HadithScreen } from './HadithScreen';
 export { default as DuaScreen } from './DuaScreen';
 export { default as BookmarksScreen } from './BookmarksScreen';
+export { default as MemorizationScreen } from './MemorizationScreen';
+export { default as ReviewSessionScreen } from './ReviewSessionScreen'; // Legacy, can keep for now, or replace
+export { default as MemorizeFlow } from './MemorizeFlow';
