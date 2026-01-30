@@ -66,7 +66,75 @@ export const initDatabase = async () => {
       downloadedAt TEXT,
       lastPlayedAt TEXT
     );
-      `);
+
+    /* --- ADVANCED FEATURES SCHEMA --- */
+    
+    CREATE TABLE IF NOT EXISTS tafsir_entries (
+      id TEXT PRIMARY KEY,
+      surah INTEGER NOT NULL,
+      ayah INTEGER NOT NULL,
+      source TEXT NOT NULL,         -- e.g. "Ibn Kathir"
+      book TEXT,                    -- e.g. "Tafsir al-Qur'an al-Azim"
+      reference TEXT NOT NULL,      -- e.g. "Surah 2:255"
+      textAr TEXT,
+      textEn TEXT,
+      language TEXT,
+      translator TEXT,
+      excerptLength INTEGER,
+      authenticity TEXT,            -- e.g. "sahih" (mostly for hadith, but standardized)
+      ingestedAt TEXT,
+      version INTEGER DEFAULT 1,
+      provenanced BOOLEAN DEFAULT 0,
+      pendingReview BOOLEAN DEFAULT 1
+    );
+
+    CREATE TABLE IF NOT EXISTS word_morph (
+      id TEXT PRIMARY KEY,            -- e.g., "surah:ayah:wordIndex"
+      surah INTEGER,
+      ayah INTEGER,
+      wordIndex INTEGER,
+      surface TEXT,
+      root TEXT,
+      partOfSpeech TEXT,
+      morphologicalTags TEXT,         -- JSON string
+      gloss TEXT,
+      source TEXT,
+      reference TEXT,
+      ingestedAt TEXT,
+      version INTEGER DEFAULT 1       -- Content Versioning
+    );
+
+    CREATE TABLE IF NOT EXISTS scholar_review (
+      id TEXT PRIMARY KEY,
+      itemId TEXT,
+      itemType TEXT,
+      ingestedAt TEXT,
+      uploadedBy TEXT,
+      reviewStatus TEXT, -- pending|approved|rejected
+      reviewer TEXT,
+      reviewedAt TEXT,
+      notes TEXT,
+      sourceFiles TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS plans (
+      id TEXT PRIMARY KEY,
+      type TEXT, -- 'juz_per_week' | 'pages_per_day' | custom
+      target INTEGER,
+      startDate TEXT,
+      recurrence JSON, 
+      createdAt TEXT,
+      enabled INTEGER
+    );
+
+    CREATE TABLE IF NOT EXISTS plan_progress (
+      id TEXT PRIMARY KEY,
+      planId TEXT,
+      date TEXT,
+      achieved INTEGER,
+      target INTEGER
+    );
+        `);
 
   // RUN MIGRATION
   await migrateMemorizationSchema(db);

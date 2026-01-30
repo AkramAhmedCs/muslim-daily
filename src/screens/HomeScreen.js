@@ -14,7 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../theme';
 import { useGreeting } from '../hooks/useGreeting';
 import { Card, ChecklistItem } from '../components';
-import { getChecklist, updateChecklist, getStreak } from '../services';
+import { getChecklist, updateChecklist, getStreak, haptics } from '../services'; // Added haptics
 import adhkarData from '../../data/adhkar.json';
 
 const HomeScreen = ({ navigation }) => {
@@ -59,6 +59,8 @@ const HomeScreen = ({ navigation }) => {
     const newValue = !checklist[key];
     const updated = await updateChecklist(key, newValue);
     if (updated) {
+      if (newValue) haptics.success(); // Tactile feedback
+      else haptics.light();
       setChecklist(updated);
       // Refresh streak in case this completion updated it
       const updatedStreak = await getStreak();
@@ -266,6 +268,23 @@ const HomeScreen = ({ navigation }) => {
             <Ionicons name="school-outline" size={28} color={theme.primary} />
             <Text style={[styles.quickActionText, { color: theme.text }]}>Hifz</Text>
           </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.quickAction,
+              {
+                backgroundColor: theme.background === '#FFFFFF' ? '#FFFFFF' : (theme.background || '#FFFFFF'),
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: theme.border || '#E0E0E0',
+                opacity: pressed ? 0.9 : 1
+              }
+            ]}
+            onPress={() => navigation.navigate('Goals')}
+          >
+            <Ionicons name="trophy-outline" size={28} color={theme.primary} />
+            <Text style={[styles.quickActionText, { color: theme.text }]}>Goals</Text>
+          </Pressable>
+
         </View>
 
         {/* Daily Checklist */}

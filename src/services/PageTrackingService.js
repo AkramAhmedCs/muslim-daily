@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { readFirstQuery, writeQuery, runTransaction } from './DatabaseService';
 import { incrementQuranStats } from './storage';
+import { syncDailyProgress } from './GoalsService';
 
 const LEGACY_TRACKING_KEY = '@muslim_daily_page_tracking';
 
@@ -27,6 +28,15 @@ export const trackPageView = async (pageNumber) => {
 
       // 3. Increment global stats
       await incrementQuranStats({ pages: 1 });
+
+      // 4. AUTO-SYNC: Update Reading Goal
+      try {
+        const totalToday = await getTodayUniquePagesCount();
+        // Async call, don't await to avoid UI block (optional, but safer)
+        syncDailyProgress(totalToday).catch(err => console.warn('Goal Sync Error', err));
+      } catch (e) {
+        console.warn('Goal Sync Error Inner', e);
+      }
 
       console.log(`[PageTracking] Tracked unique page: ${pageNumber}`);
     }

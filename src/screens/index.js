@@ -12,3 +12,6 @@ export { default as BookmarksScreen } from './BookmarksScreen';
 export { default as MemorizationScreen } from './MemorizationScreen';
 export { default as ReviewSessionScreen } from './ReviewSessionScreen'; // Legacy, can keep for now, or replace
 export { default as MemorizeFlow } from './MemorizeFlow';
+export { default as SearchScreen } from './SearchScreen';
+export { default as GoalsScreen } from './GoalsScreen';
+export { default as ScholarReviewScreen } from './ScholarReviewScreen';

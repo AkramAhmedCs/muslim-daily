@@ -14,8 +14,10 @@ import {
   isBookmarked as checkIsBookmarked, // Now returns ID or null
   trackPageView,
   getJuzProgress,
-  getTodayReadingMinutes
+  getTodayReadingMinutes,
+  getTafsirForAyah
 } from '../services';
+import { isFeatureEnabled } from '../config/features';
 
 // Note: No text manipulation imports - Bismillah fix is done at render level
 
@@ -64,6 +66,11 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
   const [selectedSurah, setSelectedSurah] = useState(null);
   const [showTranslation, setShowTranslation] = useState(true);
   const [currentAyahIndex, setCurrentAyahIndex] = useState(0);
+
+  // Advanced Features State
+  const [showTafsir, setShowTafsir] = useState(false);
+  const [tafsirData, setTafsirData] = useState([]);
+  const [loadingTafsir, setLoadingTafsir] = useState(false);
 
   // Analytics State
   const [showStats, setShowStats] = useState(false);
@@ -425,6 +432,40 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
                   color={theme.textSecondary}
                 />
               </Pressable>
+
+              {/* Tafsir (Strict Mode) */}
+              <Pressable
+                style={[styles.heartButton, { marginLeft: 16 }]}
+                onPress={async () => {
+                  if (!isFeatureEnabled('tafsir')) {
+                    alert('Feature disabled');
+                    return;
+                  }
+                  setShowTafsir(true);
+                  setLoadingTafsir(true);
+                  try {
+                    // FIX: Use numberInSurah for correct lookup (1-relative)
+                    const ayahNum = currentAyah.numberInSurah || (currentAyahIndex + 1);
+                    console.log(`[Tafsir] Fetching for Surah ${selectedSurah.number} Ayah ${ayahNum}`);
+                    const data = await getTafsirForAyah(selectedSurah.number, ayahNum);
+                    setTafsirData(data); // Will be empty if unprovenanced
+                  } catch (e) {
+                    console.error(e);
+                  } finally {
+                    setLoadingTafsir(false);
+                  }
+                }}
+              >
+                <Ionicons name="book-outline" size={28} color={theme.textSecondary} />
+              </Pressable>
+
+              {/* Share (New) */}
+              <Pressable
+                style={[styles.heartButton, { marginLeft: 16 }]}
+                onPress={() => alert('Share Card generation coming soon')}
+              >
+                <Ionicons name="share-social-outline" size={28} color={theme.textSecondary} />
+              </Pressable>
             </View>
 
             {showDecorativeHeader && isFirstDisplayableAyah && (
@@ -534,6 +575,84 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
     </Modal>
   );
 
+  const renderTafsirModal = () => (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={showTafsir}
+      onRequestClose={() => setShowTafsir(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={[styles.modalContent, { backgroundColor: theme.surface, height: '60%' }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
+            <Text style={[styles.modalTitle, { color: theme.text }]}>Scholar Verified Tafsir</Text>
+            <Pressable onPress={() => setShowTafsir(false)}>
+              <Ionicons name="close" size={24} color={theme.text} />
+            </Pressable>
+          </View>
+
+          {loadingTafsir ? (
+            <ActivityIndicator size="large" color={theme.primary} style={{ marginTop: 40 }} />
+          ) : tafsirData.length === 0 ? (
+            <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1, padding: 20 }}>
+              <Ionicons name="shield-checkmark-outline" size={64} color={theme.textSecondary} style={{ marginBottom: 16, opacity: 0.5 }} />
+              <Text style={{ color: theme.text, fontSize: 18, fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>
+                No Verified Content Available
+              </Text>
+              <Text style={{ color: theme.textSecondary, textAlign: 'center' }}>
+                We strictly display content only after scholar review and provenance verification.
+                No entries have been approved for this Ayah yet.
+              </Text>
+            </View>
+          ) : (
+            <ScrollView>
+              <View style={{ padding: 20 }}>
+                {tafsirData.map((item, index) => (
+                  <View key={index} style={{ marginBottom: 24, paddingBottom: 24, borderBottomWidth: 1, borderBottomColor: theme.border }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <Text style={{ color: theme.primary, fontWeight: 'bold' }}>{item.source}</Text>
+                      <Text style={{ color: theme.textSecondary, fontSize: 12 }}>{item.book}</Text>
+                    </View>
+
+                    {/* Arabic Text */}
+                    <Text style={{
+                      fontSize: 18,
+                      color: theme.text,
+                      textAlign: 'right',
+                      lineHeight: 32,
+                      writingDirection: 'rtl',
+                      fontFamily: 'System'
+                    }}>
+                      {item.textAr}
+                    </Text>
+
+                    {/* English Text (if available) */}
+                    {item.textEn && (
+                      <Text style={{
+                        fontSize: 16,
+                        color: theme.text,
+                        marginTop: 12,
+                        lineHeight: 24
+                      }}>
+                        {item.textEn}
+                      </Text>
+                    )}
+
+                    <View style={{ flexDirection: 'row', marginTop: 12 }}>
+                      <View style={{ backgroundColor: theme.surface, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, marginRight: 8, borderWidth: 1, borderColor: theme.border }}>
+                        <Text style={{ fontSize: 10, color: theme.textSecondary }}>{item.authenticity || 'Verified'}</Text>
+                      </View>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+
   const renderSurahDetail = () => {
     if (!selectedSurah) return null;
 
@@ -592,6 +711,7 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
 
       {selectedSurah ? renderSurahDetail() : renderSurahList()}
       {renderStatsModal()}
+      {renderTafsirModal()}
     </View>
   );
 };

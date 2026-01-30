@@ -17,6 +17,9 @@ import {
   PrayerCalendarScreen,
   PrayerSettingsScreen,
   BookmarksScreen,
+  SearchScreen,
+  GoalsScreen,
+  ScholarReviewScreen,
   MemorizationScreen,
   ReviewSessionScreen,
   MemorizeFlow,
@@ -92,6 +95,8 @@ const CustomTabBar = ({ state, descriptors, navigation, theme }) => {
   );
 };
 
+import TafsirLoader from '../components/TafsirLoader';
+
 const AppNavigator = () => {
   const { theme, isDarkMode } = useTheme();
 
@@ -110,6 +115,7 @@ const AppNavigator = () => {
         },
       }}
     >
+      <TafsirLoader />
       <Tab.Navigator
         tabBar={(props) => <CustomTabBar {...props} theme={theme} />}
         detachInactiveScreens={false}
@@ -151,6 +157,36 @@ const AppNavigator = () => {
           options={{
             headerShown: false,
             tabBarButton: () => null, // Hide from tab bar
+            tabBarStyle: { display: 'none' }
+          }}
+        />
+
+        <Tab.Screen
+          name="Search"
+          component={SearchScreen}
+          options={{
+            headerShown: false,
+            tabBarButton: () => null,
+            tabBarStyle: { display: 'none' }
+          }}
+        />
+        <Tab.Screen
+          name="Goals"
+          component={GoalsScreen}
+          options={{
+            title: 'Reading Goals',
+            headerShown: true, // Show header for back button
+            tabBarButton: () => null,
+            tabBarStyle: { display: 'none' }
+          }}
+        />
+        <Tab.Screen
+          name="ScholarReview"
+          component={ScholarReviewScreen}
+          options={{
+            title: 'Scholar Portal',
+            headerShown: true,
+            tabBarButton: () => null,
             tabBarStyle: { display: 'none' }
           }}
         />

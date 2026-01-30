@@ -165,6 +165,8 @@ const SettingsScreen = () => {
         <Text style={[styles.resetHint, { color: theme.textSecondary }]}>
           Use this if your checklist shows incorrect task count
         </Text>
+
+
       </Card>
 
       <View style={styles.about}>
