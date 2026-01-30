@@ -16,6 +16,7 @@ import {
   PrayerTimesScreen,
   PrayerCalendarScreen,
   PrayerSettingsScreen,
+  BookmarksScreen,
 } from '../screens';
 
 const Tab = createBottomTabNavigator();
@@ -141,6 +142,14 @@ const AppNavigator = () => {
         <Tab.Screen
           name="PrayerSettings"
           component={PrayerSettingsScreen}
+          options={{
+            tabBarButton: () => null,
+            tabBarStyle: { display: 'none' }
+          }}
+        />
+        <Tab.Screen
+          name="Bookmarks"
+          component={BookmarksScreen}
           options={{
             tabBarButton: () => null,
             tabBarStyle: { display: 'none' }

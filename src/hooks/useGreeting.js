@@ -123,6 +123,7 @@ export const useGreeting = () => {
   return {
     greeting,
     lastUpdated,
+    refreshGreeting: calculateGreeting,
     forceUpdate: calculateGreeting
   };
 };

@@ -1,67 +1,88 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { readFirstQuery, writeQuery, runTransaction } from './DatabaseService';
 import { incrementQuranStats } from './storage';
 
-const PAGE_TRACKING_KEY = '@muslim_daily_page_tracking';
-
-// Format: { [dateString]: [page1, page2, ...] }
-// dateString: YYYY-MM-DD
+const LEGACY_TRACKING_KEY = '@muslim_daily_page_tracking';
 
 const getTodayString = () => new Date().toISOString().split('T')[0];
 
 export const trackPageView = async (pageNumber) => {
   if (!pageNumber) return;
 
+  const today = getTodayString();
+
   try {
-    const today = getTodayString();
-    const json = await AsyncStorage.getItem(PAGE_TRACKING_KEY);
-    const trackingData = json ? JSON.parse(json) : {};
+    // 1. Check if already exists (using readFirstQuery for Next API)
+    const checkResult = await readFirstQuery(
+      `SELECT 1 as exists_flag FROM page_reads WHERE page = ? AND date_read = ?`,
+      [pageNumber, today]
+    );
 
-    // Get today's pages or init empty array
-    const todayPages = trackingData[today] || [];
+    if (!checkResult) {
+      // 2. Insert new record
+      await writeQuery(
+        `INSERT INTO page_reads (page, date_read) VALUES (?, ?)`,
+        [pageNumber, today]
+      );
 
-    // Check if page already tracked today
-    if (!todayPages.includes(pageNumber)) {
-      // Add page
-      todayPages.push(pageNumber);
-
-      // Update data
-      trackingData[today] = todayPages;
-
-      // Cleanup old dates (keep last 7 days for safety/history if needed, or just today)
-      // For simplicity, let's keep only today to save space, or maybe last few days.
-      // Let's just keep everything for now but realistically we should prune.
-      // Pruning logic:
-      Object.keys(trackingData).forEach(date => {
-        if (date !== today) {
-          delete trackingData[date]; // Simple cleanup: keep only today
-        }
-      });
-
-      // Save back
-      await AsyncStorage.setItem(PAGE_TRACKING_KEY, JSON.stringify(trackingData));
-
-      // Increment global stats
-      // IMPT: We only increment stats if it's a NEW page for today
+      // 3. Increment global stats
       await incrementQuranStats({ pages: 1 });
 
       console.log(`[PageTracking] Tracked unique page: ${pageNumber}`);
-    } else {
-      // console.log(`[PageTracking] Page ${pageNumber} already read today`);
     }
-
   } catch (error) {
-    console.error('Error tracking page view:', error);
+    console.error('[PageTracking] Error tracking page:', error);
   }
 };
 
 export const getTodayUniquePagesCount = async () => {
+  const today = getTodayString();
   try {
-    const today = getTodayString();
-    const json = await AsyncStorage.getItem(PAGE_TRACKING_KEY);
-    const trackingData = json ? JSON.parse(json) : {};
-    const todayPages = trackingData[today] || [];
-    return todayPages.length;
+    const result = await readFirstQuery(
+      `SELECT COUNT(*) as count FROM page_reads WHERE date_read = ?`,
+      [today]
+    );
+    return result ? result.count : 0;
   } catch (e) {
+    console.error('[PageTracking] Error counting pages:', e);
     return 0;
+  }
+};
+
+export const migrateLegacyData = async () => {
+  try {
+    const json = await AsyncStorage.getItem(LEGACY_TRACKING_KEY);
+    if (!json) return;
+
+    const trackingData = JSON.parse(json);
+    const dates = Object.keys(trackingData);
+
+    if (dates.length === 0) return;
+
+    console.log('[PageTracking] Migrating legacy data...', dates.length, 'dates');
+
+    // Use transaction for bulk insert
+    // Note: for...of is required for async/await inside transaction
+    await runTransaction(async () => {
+      for (const date of dates) {
+        const pages = trackingData[date];
+        if (Array.isArray(pages)) {
+          for (const page of pages) {
+            await writeQuery(
+              `INSERT OR IGNORE INTO page_reads (page, date_read) VALUES (?, ?)`,
+              [page, date]
+            );
+          }
+        }
+      }
+    });
+
+    await AsyncStorage.setItem(LEGACY_TRACKING_KEY + '_migrated', json);
+    await AsyncStorage.removeItem(LEGACY_TRACKING_KEY);
+
+    console.log('[PageTracking] Migration complete.');
+
+  } catch (error) {
+    console.error('[PageTracking] Migration error:', error);
   }
 };
