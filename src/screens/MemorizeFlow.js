@@ -5,7 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../theme';
 import { ArabicText, Card } from '../components';
-import { getPlayableUrl, recordAttempt } from '../services';
+// ... imports ...
+import { getPlayableUrl, recordAttempt, addItem } from '../services';
 import { normalizeArabicText } from '../utils/textProcessing';
 import { Audio } from 'expo-av';
 import quranData from '../../data/quran_full.json';
@@ -26,7 +27,102 @@ const RECALL_TYPE_RECITE = 'C';
 const MemorizeFlow = ({ route, navigation }) => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
-  const { item, queueLength, currentIndex } = route.params; // Expect full item object
+
+  // Normalize Params (handle both Queue Mode and Single Verse Mode)
+  const params = route.params || {};
+  // The original `item` is now `initialItem` from route params, and `dbItem` will be the active item.
+  const { item: initialItem, queueLength = 1, currentIndex = 0 } = params;
+
+  // State for the actual item being memorized, potentially from DB
+  const [dbItem, setDbItem] = useState(null);
+
+  // 1. Initialize Item (Auto-Add to DB if direct navigation)
+  useEffect(() => {
+    const init = async () => {
+      try {
+        // Already have a full item?
+        if (initialItem && initialItem.id && !initialItem.id.startsWith('temp')) {
+          setDbItem(initialItem);
+          setLoading(false);
+          return;
+        }
+
+        // Direct navigation: Params but no full item
+        if (params.surah && params.ayah) {
+          const s = parseInt(params.surah);
+          const a = parseInt(params.ayah);
+
+          console.log('[MemorizeFlow] Auto-adding item:', s, a);
+
+          // Add to DB or get existing ID (with timeout)
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Database init timed out')), 5000)
+          );
+
+          const id = await Promise.race([
+            addItem(s, a),
+            timeoutPromise
+          ]);
+
+          // Construct full object
+          setDbItem({
+            id,
+            surah: s,
+            ayah: a,
+            status: 'learning' // Default
+          });
+        } else {
+          // No params?
+          console.error('[MemorizeFlow] Missing surah/ayah params');
+        }
+      } catch (e) {
+        console.error('[MemorizeFlow] Init failed', e);
+        Alert.alert('Error', 'Failed to load memorization item: ' + e.message);
+        // Fallback: allow preview but disable grading? Or just go back?
+        // For now, let's stop loading so they see the screen, but maybe grading will fail.
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    init();
+  }, [initialItem, params.surah, params.ayah]);
+
+  console.log('[MemorizeFlow] Params:', JSON.stringify(params));
+
+  // Fallback: If navigating from Reader, we just get { surah, ayah }
+  // This block is now largely superseded by the useEffect above, but kept for clarity if `dbItem` is not yet set.
+  // The `item` variable here is now `dbItem` for the rest of the component's logic.
+  let activeItem = dbItem; // Use dbItem as the primary source for the active item
+
+  if (!activeItem && params.surah && params.ayah) {
+    const s = parseInt(params.surah);
+    const a = parseInt(params.ayah);
+
+    // Construct temp item if dbItem is not yet loaded but params exist
+    activeItem = {
+      id: `temp_${s}_${a}`,
+      surah: s,
+      ayah: a
+    };
+    console.log('[MemorizeFlow] Constructed temp item:', activeItem);
+  }
+
+  // Validate item
+  if (!activeItem) {
+    console.error('[MemorizeFlow] Item is null/undefined after normalization');
+    // ...
+  }
+
+  if (!activeItem) {
+    // Safety fallback
+    return (
+      <View style={[styles.centerContent, { backgroundColor: theme.background }]}>
+        <Text style={{ color: theme.error }}>Error: No ayah selected</Text>
+        <Pressable onPress={() => navigation.goBack()}><Text style={{ color: theme.primary }}>Go Back</Text></Pressable>
+      </View>
+    );
+  }
 
   // State
   const [stage, setStage] = useState(STAGE_PREP);
@@ -44,8 +140,11 @@ const MemorizeFlow = ({ route, navigation }) => {
   const [showHint, setShowHint] = useState(false);
 
   // Data
-  const surah = quranData.surahs.find(s => s.number === item.surah);
-  const ayahObj = surah.ayahs.find(a => a.number === item.ayah);
+  const surah = quranData.surahs.find(s => s.number === activeItem.surah);
+  // LOOKUP FIX: item.ayah is RELATIVE (1..N). Array is 0-indexed.
+  // quranData ayahs have 'number' as GLOBAL ID, so we cannot use .find(number).
+  // We strictly assume ayahs are sorted 1..N in the array.
+  const ayahObj = surah ? surah.ayahs[activeItem.ayah - 1] : null;
   const ayahText = ayahObj ? ayahObj.text : '';
 
   useEffect(() => {
@@ -61,7 +160,7 @@ const MemorizeFlow = ({ route, navigation }) => {
 
     loadAudio();
     // No cleanup here, we use useFocusEffect
-  }, [item.id]);
+  }, [activeItem.id]);
 
   useFocusEffect(
     useCallback(() => {
@@ -76,8 +175,11 @@ const MemorizeFlow = ({ route, navigation }) => {
   );
 
   const loadAudio = async () => {
+    // Safety check
+    if (!activeItem || !activeItem.surah || !activeItem.ayah) return;
+
     try {
-      const uri = await getPlayableUrl(item.surah, item.ayah);
+      const uri = await getPlayableUrl(activeItem.surah, activeItem.ayah);
       setAudioUri(uri);
       setLoading(false);
     } catch (e) {
@@ -116,7 +218,7 @@ const MemorizeFlow = ({ route, navigation }) => {
   const renderPrep = () => (
     <View style={styles.centerContent}>
       <Text style={[styles.title, { color: theme.text }]}>Memorize</Text>
-      <Text style={[styles.subtitle, { color: theme.primary }]}>{surah.englishName} {item.surah}:{item.ayah}</Text>
+      <Text style={[styles.subtitle, { color: theme.primary }]}>{surah.englishName} {activeItem.surah}:{activeItem.ayah}</Text>
       <View style={styles.spacer} />
       <Pressable style={[styles.btn, { backgroundColor: theme.surface }]} onPress={() => playAudio(false)}>
         <Ionicons name="play" size={32} color={theme.primary} />
@@ -204,7 +306,7 @@ const MemorizeFlow = ({ route, navigation }) => {
 
   const handleGrade = async (grade) => {
     try {
-      await recordAttempt(item.id, grade);
+      await recordAttempt(activeItem.id, grade);
       setStage(STAGE_DONE);
       setTimeout(() => {
         navigation.goBack(); // Return to queue

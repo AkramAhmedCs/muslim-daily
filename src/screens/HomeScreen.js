@@ -55,17 +55,43 @@ const HomeScreen = ({ navigation }) => {
     setRefreshing(false);
   };
 
-  const handleToggle = async (key) => {
+  const handleToggle = (key) => {
+    // 1. Optimistic Update: Update UI immediately
     const newValue = !checklist[key];
-    const updated = await updateChecklist(key, newValue);
-    if (updated) {
-      if (newValue) haptics.success(); // Tactile feedback
-      else haptics.light();
-      setChecklist(updated);
-      // Refresh streak in case this completion updated it
-      const updatedStreak = await getStreak();
-      setStreak(updatedStreak);
+
+    setChecklist(prev => ({
+      ...prev,
+      [key]: newValue
+    }));
+
+    // 2. Instant Feedback
+    if (newValue) {
+      haptics.success();
+    } else {
+      haptics.light();
     }
+
+    // 3. Background Sync: Persist to storage
+    // We don't await this blocking the UI
+    updateChecklist(key, newValue).then(async (updated) => {
+      if (updated) {
+        // success - sync fully to ensure consistency
+        // (Optional: if we trust the optimistic value, we don't need to re-set, 
+        // but it's good to ensure we match the DB)
+        setChecklist(updated);
+
+        // Update streak in background
+        const updatedStreak = await getStreak();
+        setStreak(updatedStreak);
+      } else {
+        // 4. Revert on Failure
+        setChecklist(prev => ({
+          ...prev,
+          [key]: !newValue
+        }));
+        console.error('Failed to save checklist state');
+      }
+    });
   };
 
   // Get featured adhkar based on time

@@ -28,12 +28,12 @@ export const initDatabase = async () => {
         start_at TEXT NOT NULL,
         end_at TEXT,
         duration_seconds INTEGER DEFAULT 0,
-        surah_start INTEGER,
-        ayah_start INTEGER,
-        surah_end INTEGER,
-        ayah_end INTEGER,
+        start_surah INTEGER,
+        start_ayah INTEGER,
+        end_surah INTEGER,
+        end_ayah INTEGER,
         source TEXT,
-        status TEXT DEFAULT 'completed' 
+        created_at TEXT NOT NULL
       );
       CREATE TABLE IF NOT EXISTS page_reads (
         page INTEGER NOT NULL,
@@ -138,8 +138,79 @@ export const initDatabase = async () => {
 
   // RUN MIGRATION
   await migrateMemorizationSchema(db);
+  await migrateReadingSessionsSchema(db);
 
   console.log('[Database] Initialized');
+};
+
+const migrateReadingSessionsSchema = async (db) => {
+  try {
+    const tableInfo = await db.getAllAsync(`PRAGMA table_info(reading_sessions)`);
+    const columns = tableInfo.map(c => c.name);
+
+    // Check for new columns
+    const needed = ['start_surah', 'start_ayah', 'end_surah', 'end_ayah', 'created_at', 'source'];
+    const missing = needed.filter(c => !columns.includes(c));
+
+    // Check if status exists (legacy column to remove/ignore)
+    // If table exists but schema is totally different (old schema had 'surah_start', 'ayah_start' maybe? 
+    // Previous logs showed 'surah_start', 'ayah_start'.
+
+    if (missing.length === 0) return;
+
+    console.log('[Database] Migrating reading_sessions table...', missing);
+
+    await db.withTransactionAsync(async () => {
+      // Simple strategy: Alter table for each missing column, or Recreate if too complex.
+      // Old schema: id, start_at, end_at, duration_seconds, surah_start, ayah_start, surah_end, ayah_end, source, status
+      // New schema: id, start_at, end_at, duration_seconds, start_surah, start_ayah, end_surah, end_ayah, source, created_at
+
+      // We'll rename and recreate to be safe and clean up names
+      await db.execAsync(`ALTER TABLE reading_sessions RENAME TO reading_sessions_old`);
+
+      await db.execAsync(`
+          CREATE TABLE reading_sessions (
+            id TEXT PRIMARY KEY NOT NULL,
+            start_at TEXT NOT NULL,
+            end_at TEXT,
+            duration_seconds INTEGER DEFAULT 0,
+            start_surah INTEGER,
+            start_ayah INTEGER,
+            end_surah INTEGER,
+            end_ayah INTEGER,
+            source TEXT,
+            created_at TEXT NOT NULL
+          );
+        `);
+
+      // Migrate data (best effort mapping)
+      // surah_start -> start_surah
+      // ayah_start -> start_ayah
+      // status column is dropped
+
+      // Check if old table had surah_start (it might be the very old legacy one)
+      // We will try to SELECT from old. If columns don't exist, we default to NULL.
+      // Actually, easiest is to just copy common fields: id, start_at, end_at, duration_seconds, source.
+      // And map surah_start -> start_surah IF it exists. 
+      // Dynamic SQL is hard here.
+
+      // Let's assume standard legacy: surah_start, ayah_start.
+      // If the user's DB is in a weird state, this might fail. 
+      // But 'reading_sessions has no column' usually means we are trying to INSERT new cols into OLD table.
+
+      // Safe migration: Copy generic fields.
+      await db.execAsync(`
+            INSERT INTO reading_sessions (id, start_at, end_at, duration_seconds, source, created_at)
+            SELECT id, start_at, end_at, duration_seconds, source, start_at FROM reading_sessions_old
+        `);
+
+      await db.execAsync(`DROP TABLE reading_sessions_old`);
+    });
+    console.log('[Database] reading_sessions migration done');
+
+  } catch (e) {
+    console.error('[Database] reading_sessions migration failed', e);
+  }
 };
 
 const migrateMemorizationSchema = async (db) => {

@@ -100,6 +100,17 @@ import TafsirLoader from '../components/TafsirLoader';
 const AppNavigator = () => {
   const { theme, isDarkMode } = useTheme();
 
+  // Navigation Integrity Check
+  React.useEffect(() => {
+    if (__DEV__) {
+      console.log('[Navigation] Checking Integrity...');
+      // We can't easily check 'navigator.hasRoute' in v6/v7 declaratively, 
+      // but we can ensure imports are valid.
+      if (!QuranScreen) console.error('CRITICAL: QuranScreen import is missing/undefined');
+      if (!TafsirLoader) console.error('CRITICAL: TafsirLoader import is missing/undefined');
+    }
+  }, []);
+
   return (
     <NavigationContainer
       theme={{

@@ -11,3 +11,5 @@ export * from './TafsirService'; // FIX: strict-provenance tafsir
 export * from './IngestionService'; // Admin tools
 export * from './GoalsService'; // NEW
 export * from './HapticsService'; // NEW
+export * from './notifications';
+export * from './PrayerCheckinService';

@@ -40,27 +40,38 @@ export const getDueItems = async (nowISO, limit = 50) => {
  * Defaults: status='learning', createdAt=now, nextReviewAt=now
  */
 export const addItem = async (surah, ayah, page = 0) => {
-  // Check existence
-  const existing = await readFirstQuery(
-    `SELECT id FROM memorization WHERE surah = ? AND ayah = ?`,
-    [surah, ayah]
-  );
-  if (existing) return existing.id;
+  console.log('[MemorizationService] addItem called for:', surah, ayah);
+  try {
+    // Check existence
+    const existing = await readFirstQuery(
+      `SELECT id FROM memorization WHERE surah = ? AND ayah = ?`,
+      [surah, ayah]
+    );
+    if (existing) {
+      console.log('[MemorizationService] Item exists:', existing.id);
+      return existing.id;
+    }
 
-  const id = getUUID();
-  const now = getISO();
+    const id = getUUID();
+    const now = getISO();
+    console.log('[MemorizationService] Creating new item:', id);
 
-  await writeQuery(
-    `INSERT INTO memorization (
-            id, surah, ayah, page, status, 
-            totalReps, consecutiveCorrect, easeFactor, intervalDays, 
-            nextReviewAt, lastAttemptAt, lastGrade, 
-            createdAt, updatedAt
-        ) VALUES (?, ?, ?, ?, 'learning', 0, 0, ?, 0, ?, NULL, NULL, ?, ?)`,
-    [id, surah, ayah, page, INITIAL_EASE, now, now, now]
-  );
+    await writeQuery(
+      `INSERT INTO memorization (
+              id, surah, ayah, page, status, 
+              totalReps, consecutiveCorrect, easeFactor, intervalDays, 
+              nextReviewAt, lastAttemptAt, lastGrade, 
+              createdAt, updatedAt
+          ) VALUES (?, ?, ?, ?, 'learning', 0, 0, ?, 0, ?, NULL, NULL, ?, ?)`,
+      [id, surah, ayah, page, INITIAL_EASE, now, now, now]
+    );
+    console.log('[MemorizationService] Item created successfully');
 
-  return id;
+    return id;
+  } catch (e) {
+    console.error('[MemorizationService] addItem failed:', e);
+    throw e;
+  }
 };
 
 /**

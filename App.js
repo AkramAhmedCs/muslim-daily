@@ -44,8 +44,17 @@ export default function App() {
         await migrateLegacyData(); // Migrate legacy page reads
         await runDataMigration(); // General migration
         await getSettings(); // Pre-load settings
-        // Note: We don't call refreshGreeting here anymore, it's handled in AppContent
+
+        // VERIFICATION RUN
+        if (__DEV__) {
+          const { runVerification } = require('./src/services/VerificationService');
+          await runVerification();
+
+          const { runDiagnostics } = require('./src/services/DiagnosticService');
+          await runDiagnostics();
+        }
       } catch (e) {
+        // Note: We don't call refreshGreeting here anymore, it's handled in AppContent
         console.warn(e);
       } finally {
         setIsReady(true);

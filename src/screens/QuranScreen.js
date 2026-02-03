@@ -1,789 +1,467 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, FlatList, ActivityIndicator, Modal, I18nManager, Dimensions, PanResponder, Image, BackHandler } from 'react-native';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { View, Text, StyleSheet, Modal, Pressable, BackHandler, ActivityIndicator, PanResponder, I18nManager, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import { useTheme } from '../theme';
 import { useLanguage } from '../context';
 import { Card, ArabicText } from '../components';
+import VerseCard from '../components/VerseCard';
+import AudioBottomSheet from '../components/AudioBottomSheet';
 import {
   startSession,
   endSession,
   addBookmark,
   deleteBookmark,
-  isBookmarked as checkIsBookmarked, // Now returns ID or null
+  isBookmarked as checkIsBookmarked,
   trackPageView,
   getJuzProgress,
   getTodayReadingMinutes,
-  getTafsirForAyah
+  getTafsirForAyah,
+  addItem,
+  getJuzProgressForAyah,
+  formatJuzProgress
 } from '../services';
+import { triggerHaptic } from '../services/HapticsService';
 import { isFeatureEnabled } from '../config/features';
 
-// Note: No text manipulation imports - Bismillah fix is done at render level
-
-// Import the full Quran data
 import quranData from '../../data/quran_full.json';
 import translationsData from '../../data/quran_translations.json';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-// Convert to Arabic-Indic numerals
 const toArabicNumerals = (num) => {
   if (num === undefined || num === null) return '';
   const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
   return String(num).split('').map(d => arabicNumerals[parseInt(d)] || d).join('');
 };
 
-// Decorative Bismillah text for header display only (never modify Quran data)
-const BASMALAH_TEXT = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
-
-// Known pure Bismillah patterns (exact text, read-only comparison)
-const PURE_BISMILLAH_PATTERNS = [
-  'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
-  '\ufeffبِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
-  'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-  '\ufeffبِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-];
-
-const isPureBismillahAyah = (ayahText) => {
-  if (!ayahText) return false;
-  const trimmed = ayahText.trim();
-  return PURE_BISMILLAH_PATTERNS.includes(trimmed);
-};
-
-const shouldShowDecorativeHeaderAndSkipAyah1 = (surah) => {
-  if (!surah || !surah.ayahs || surah.ayahs.length === 0) return false;
-  if (surah.number === 1 || surah.number === 9) return false;
-  const ayah1Text = surah.ayahs[0]?.text || '';
-  return isPureBismillahAyah(ayah1Text);
-};
-
 const QuranScreen = ({ navigation, route, onSurahChange }) => {
   const { theme } = useTheme();
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
   const insets = useSafeAreaInsets();
 
+  // State
   const [selectedSurah, setSelectedSurah] = useState(null);
-  const [showTranslation, setShowTranslation] = useState(true);
   const [currentAyahIndex, setCurrentAyahIndex] = useState(0);
+  const [isControlsVisible, setIsControlsVisible] = useState(true); // For toggling UI
 
-  // Advanced Features State
-  const [showTafsir, setShowTafsir] = useState(false);
-  const [tafsirData, setTafsirData] = useState([]);
+  // Data State
+  const [tafsirData, setTafsirData] = useState(null);
   const [loadingTafsir, setLoadingTafsir] = useState(false);
 
+  // Juz Progress State
+  const [juzProgress, setJuzProgress] = useState(null);
+
   // Analytics State
-  const [showStats, setShowStats] = useState(false);
+  const [showStatsModal, setShowStatsModal] = useState(false);
   const [sessionMins, setSessionMins] = useState(0);
-  const [juzProgress, setJuzProgress] = useState({ pagesRead: 0, totalPages: 0, progressPercent: 0 });
-  const [currentBookmarkId, setCurrentBookmarkId] = useState(null); // Stores ID if bookmarked, else null
+  const [currentBookmarkId, setCurrentBookmarkId] = useState(null);
 
   // Audio State
   const [sound, setSound] = useState();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [showAudioSheet, setShowAudioSheet] = useState(false);
 
   const surahs = quranData.surahs || [];
   const translations = translationsData.translations || {};
 
-  // Handle Hardware Back Button
+  // --- HANDLERS & LOGIC ---
+
+  // Hardware Back Press
   useEffect(() => {
     const onBackPress = () => {
-      // If a Surah is open, close it (go back to list)
       if (selectedSurah) {
         handleSurahSelect(null);
-        return true; // Prevent default behavior (exiting app)
+        return true;
       }
-      return false; // Default behavior
+      return false;
     };
-
-    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-    return () => {
-      subscription.remove();
-    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
   }, [selectedSurah]);
 
-  // Handle Navigation Params (Resume from Bookmark)
+  // Route Params (Deep Link / Resume)
   useEffect(() => {
     if (route.params?.surahNumber && route.params?.ayahNumber) {
       const surah = surahs.find(s => s.number === route.params.surahNumber);
       if (surah) {
-        // Find index of ayah
-        const ayahIndex = surah.ayahs.findIndex(a => a.number === route.params.ayahNumber);
-
-        if (ayahIndex !== -1) {
-          handleSurahSelect(surah, ayahIndex);
-          // CRITICAL Fix: Clear params so we don't re-trigger this on Back press
+        const idx = surah.ayahs.findIndex(a => a.number === route.params.ayahNumber);
+        if (idx !== -1) {
+          handleSurahSelect(surah, idx);
           navigation.setParams({ surahNumber: null, ayahNumber: null });
         }
       }
     }
-  }, [route.params, handleSurahSelect, navigation, surahs]);
+  }, [route.params]);
 
   // Audio Cleanup
   useEffect(() => {
-    return () => {
-      if (sound) sound.unloadAsync();
-    };
+    return () => { if (sound) sound.unloadAsync(); };
   }, [sound]);
 
-  // Play Ayah Audio
-  const playAyah = async (surahNum, ayahNum) => {
-    try {
-      if (isPlaying) {
-        await stopAudio();
-        return;
-      }
-
-      setIsLoadingAudio(true);
-      if (sound) await sound.unloadAsync();
-
-      const paddedSurah = String(surahNum).padStart(3, '0');
-      const paddedAyah = String(ayahNum).padStart(3, '0');
-      const url = `https://everyayah.com/data/Alafasy_128kbps/${paddedSurah}${paddedAyah}.mp3`;
-
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: url },
-        { shouldPlay: true }
-      );
-
-      setSound(newSound);
-      setIsPlaying(true);
-      setIsLoadingAudio(false);
-
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.didJustFinish) setIsPlaying(false);
-      });
-    } catch (error) {
-      console.error('Error playing audio:', error);
-      setIsLoadingAudio(false);
-      setIsPlaying(false);
-    }
-  };
-
-  const stopAudio = async () => {
-    if (sound) {
-      await sound.stopAsync();
-      setIsPlaying(false);
-    }
-  };
-
-  const getAyahNumber = (ayah, index) => {
-    if (ayah && ayah.numberInSurah !== undefined) return ayah.numberInSurah;
-    return index + 1;
-  };
-
-  // Surah Selection Handler
-  const handleSurahSelect = useCallback(async (surah, initialAyahIndex = 0) => {
-    // If we are exiting a surah, end the session
-    if (!surah && selectedSurah) {
-      await endSession();
-    }
-
-    setSelectedSurah(surah);
-    setCurrentAyahIndex(initialAyahIndex);
-
-    if (onSurahChange) onSurahChange(surah);
-  }, [onSurahChange, selectedSurah]);
-
-  // Navigation Helpers
-  const navigateToPrevSurah = useCallback(() => {
-    if (!selectedSurah) return false;
-    const currentSurahIndex = surahs.findIndex(s => s.number === selectedSurah.number);
-    if (currentSurahIndex > 0) {
-      const prevSurah = surahs[currentSurahIndex - 1];
-      const lastAyahIndex = prevSurah.ayahs.length - 1;
-      handleSurahSelect(prevSurah, lastAyahIndex);
-      return true;
-    }
-    return false;
-  }, [selectedSurah, surahs, handleSurahSelect]);
-
-  const navigateToNextSurah = useCallback(() => {
-    if (!selectedSurah) return false;
-    const currentSurahIndex = surahs.findIndex(s => s.number === selectedSurah.number);
-    if (currentSurahIndex < surahs.length - 1) {
-      const nextSurah = surahs[currentSurahIndex + 1];
-      const startIndex = shouldShowDecorativeHeaderAndSkipAyah1(nextSurah) ? 1 : 0;
-      handleSurahSelect(nextSurah, startIndex);
-      return true;
-    }
-    return false;
-  }, [selectedSurah, surahs, handleSurahSelect]);
-
-  const navigateAyah = useCallback((direction) => {
-    if (!selectedSurah) return;
-    const maxIndex = selectedSurah.ayahs.length - 1;
-    const minIndex = shouldShowDecorativeHeaderAndSkipAyah1(selectedSurah) ? 1 : 0;
-
-    if (direction === 'next') {
-      if (currentAyahIndex < maxIndex) {
-        setCurrentAyahIndex(prev => prev + 1);
-      } else {
-        navigateToNextSurah();
-      }
-    } else if (direction === 'prev') {
-      if (currentAyahIndex > minIndex) {
-        setCurrentAyahIndex(prev => prev - 1);
-      } else {
-        navigateToPrevSurah();
-      }
-    }
-  }, [selectedSurah, currentAyahIndex, navigateToNextSurah, navigateToPrevSurah]);
-
-  // Pan Responder for Swipes
-  const panResponder = useMemo(() => PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 20,
-    onPanResponderRelease: (_, gestureState) => {
-      if (gestureState.dx < -50) navigateAyah(I18nManager.isRTL ? 'prev' : 'next');
-      else if (gestureState.dx > 50) navigateAyah(I18nManager.isRTL ? 'next' : 'prev');
-    },
-  }), [navigateAyah]);
-
-
-  // --- PRIMARY LOGIC: Sessions, Tracking, Bookmarks ---
-
-  // 1. Session Management
+  // Session Management
   useEffect(() => {
     if (selectedSurah && selectedSurah.ayahs[currentAyahIndex]) {
       const ayah = selectedSurah.ayahs[currentAyahIndex];
-      startSession({
-        surah: selectedSurah.number,
-        ayah: ayah.number,
-        source: 'verse_reader'
-      });
-
-      // Update session mins for UI
+      startSession({ surah: selectedSurah.number, ayah: ayah.number, source: 'writer_mode' });
       getTodayReadingMinutes().then(setSessionMins);
-
-      // Clean up session on unmount or change
-      return () => {
-        // We use a small timeout or just rely on next startSession/unmount
-        endSession(selectedSurah.number, ayah.number);
-      };
-    }
-  }, [selectedSurah]); // Reset session if surah changes significantly (or app backgrounded)
-
-  // 2. Page Tracking & Juz Progress
-  useEffect(() => {
-    if (!selectedSurah) return;
-
-    const ayah = selectedSurah.ayahs[currentAyahIndex];
-    if (ayah && ayah.page) {
-      // Track page view
-      trackPageView(ayah.page).then(async () => {
-        // Update Juz Progress
-        const juz = ayah.juz;
-        if (juz) {
-          const progress = await getJuzProgress(juz);
-          setJuzProgress(progress);
-        }
-      });
+      return () => endSession(selectedSurah.number, ayah.number);
     }
   }, [selectedSurah, currentAyahIndex]);
 
-  // 3. Bookmark Status
+  // Bookmark & Page Check
   useEffect(() => {
     if (!selectedSurah) return;
     const ayah = selectedSurah.ayahs[currentAyahIndex];
     if (ayah) {
-      checkIsBookmarked(selectedSurah.number, ayah.number).then(id => {
-        setCurrentBookmarkId(id); // Set ID or null
-      });
+      checkIsBookmarked(selectedSurah.number, ayah.number).then(setCurrentBookmarkId);
+      if (ayah.page) trackPageView(ayah.page);
+
+      // Reset tafsir when ayah changes
+      setTafsirData(null);
     }
   }, [selectedSurah, currentAyahIndex]);
+
+  // Juz Progress Update
+  useEffect(() => {
+    if (!selectedSurah) return;
+    const ayah = selectedSurah.ayahs[currentAyahIndex];
+    if (ayah) {
+      const progress = getJuzProgressForAyah(selectedSurah.number, ayah.number);
+      setJuzProgress(progress);
+    }
+  }, [selectedSurah, currentAyahIndex]);
+
+  const handleSurahSelect = useCallback((surah, index = 0) => {
+    if (selectedSurah && !surah) endSession(); // Close session on exit
+    setSelectedSurah(surah);
+    setCurrentAyahIndex(index);
+    if (onSurahChange) onSurahChange(surah);
+  }, [selectedSurah, onSurahChange]);
 
   const toggleBookmark = async () => {
     if (!selectedSurah) return;
     const ayah = selectedSurah.ayahs[currentAyahIndex];
-    if (!ayah) return;
-
     if (currentBookmarkId) {
-      // Remove Bookmark
       await deleteBookmark(currentBookmarkId);
       setCurrentBookmarkId(null);
     } else {
-      // Add Bookmark
       const newId = await addBookmark({
         surah: selectedSurah.number,
         ayah: ayah.number,
         page: ayah.page,
-        label: `${selectedSurah.englishName} ${ayah.numberInSurah}`
+        label: `${selectedSurah.englishName} : ${ayah.numberInSurah}`
       });
       setCurrentBookmarkId(newId);
     }
   };
 
-  // --- UI RENDER ---
+  const playAyah = async () => {
+    if (isPlaying) {
+      await sound.stopAsync();
+      setIsPlaying(false);
+      return;
+    }
+    try {
+      setIsLoadingAudio(true);
+      if (sound) await sound.unloadAsync();
 
-  const getTranslation = (surahNumber, ayahNumber) => {
-    const surahTranslations = translations[surahNumber];
-    if (!surahTranslations) return '';
-    const ayah = surahTranslations.find(a => a.number === ayahNumber);
-    return ayah ? ayah.text : '';
+      const surahNum = String(selectedSurah.number).padStart(3, '0');
+      const ayahNum = String(selectedSurah.ayahs[currentAyahIndex].number).padStart(3, '0');
+      const url = `https://everyayah.com/data/Alafasy_128kbps/${surahNum}${ayahNum}.mp3`;
+
+      const { sound: newSound } = await Audio.Sound.createAsync({ uri: url }, { shouldPlay: true });
+      setSound(newSound);
+      setIsPlaying(true);
+      newSound.setOnPlaybackStatusUpdate(status => {
+        if (status.didJustFinish) setIsPlaying(false);
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoadingAudio(false);
+    }
   };
 
-  const handleBack = useCallback(() => {
-    if (selectedSurah) {
-      handleSurahSelect(null);
-      return true;
+  // State for Toast
+  const [toastMessage, setToastMessage] = useState(null);
+
+  // Hifz Handler
+  const handleAddToHifz = async () => {
+    try {
+      const relativeAyah = currentAyahIndex + 1;
+      // Add directly to DB
+      await addItem(selectedSurah.number, relativeAyah);
+
+      // Show Success Toast
+      setToastMessage(`Added Surah ${selectedSurah.englishName} : ${relativeAyah} to Hifz`);
+      setTimeout(() => setToastMessage(null), 3000);
+
+    } catch (e) {
+      console.error(e);
+      setToastMessage("Error adding to Hifz");
+      setTimeout(() => setToastMessage(null), 3000);
     }
-    return false;
-  }, [selectedSurah, handleSurahSelect]);
-
-  useEffect(() => {
-    if (navigation && navigation.setParams) {
-      navigation.setParams({ handleBack });
-    }
-  }, [navigation, handleBack]);
-
-  const renderVerseMode = () => {
-    if (!selectedSurah || selectedSurah.ayahs.length === 0) return null;
-
-    const currentAyah = selectedSurah.ayahs[currentAyahIndex];
-    if (!currentAyah) return null;
-
-    const showDecorativeHeader = shouldShowDecorativeHeaderAndSkipAyah1(selectedSurah);
-    const minIndex = showDecorativeHeader ? 1 : 0;
-    const isFirstDisplayableAyah = currentAyahIndex === minIndex;
-    const isLastAyah = currentAyahIndex >= selectedSurah.ayahs.length - 1;
-    const isLastSurah = selectedSurah.number === 114;
-
-    const ayahNumber = getAyahNumber(currentAyah, currentAyahIndex);
-    const ayahText = currentAyah.text || '';
-    const ayahDisplayText = `${ayahText} \u06dd${toArabicNumerals(ayahNumber)}`;
-    const translation = getTranslation(selectedSurah.number, currentAyah.number);
-    const totalAyahs = selectedSurah.ayahs.length;
-    const displayedVersesCount = showDecorativeHeader ? totalAyahs - 1 : totalAyahs;
-    const displayedPosition = showDecorativeHeader ? currentAyahIndex : currentAyahIndex + 1;
-
-    // Use authoritative Juz progress if available
-    const estimatedJuz = currentAyah.juz || 1;
-
-    return (
-      <View style={styles.verseModeContainer}>
-        {/* Progress Bar (Authoritative) */}
-        <View style={styles.progressSection}>
-          <Text style={styles.progressTextLeft}>
-            {toArabicNumerals(displayedPosition)}/{toArabicNumerals(displayedVersesCount)}
-          </Text>
-          <Text style={styles.progressTextCenter}>
-            Juz {estimatedJuz} • {juzProgress.progressPercent}% Read ({juzProgress.pagesRead}/{juzProgress.totalPages} pgs)
-          </Text>
-          <Text style={styles.progressTextRight}>{toArabicNumerals(Math.round((displayedPosition / displayedVersesCount) * 100))}%</Text>
-        </View>
-
-        <ScrollView
-          style={styles.verseScrollView}
-          contentContainerStyle={{ paddingBottom: 100 }}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={[styles.verseCard, { backgroundColor: theme.surface }]}>
-            <View style={styles.cardHeader}>
-              <View style={[styles.playPill, { borderColor: theme.border }]}>
-                {isLoadingAudio ? (
-                  <ActivityIndicator size="small" color={theme.primary} style={{ marginHorizontal: 12 }} />
-                ) : (
-                  <Pressable onPress={() => playAyah(selectedSurah.number, currentAyah.number)}>
-                    <Ionicons name={isPlaying ? "pause" : "play"} size={24} color={theme.primary} />
-                  </Pressable>
-                )}
-                <Ionicons name="repeat" size={20} color={theme.textSecondary} style={{ marginLeft: 12 }} />
-              </View>
-
-              <View style={styles.surahTitleContainer}>
-                <View style={[styles.surahTitlePill, { backgroundColor: theme.primary }]}>
-                  <Text style={styles.surahTitleText}>{selectedSurah.number}. {selectedSurah.englishName}</Text>
-                </View>
-                <Text style={[styles.ayahCountText, { color: theme.primary }]}>
-                  {toArabicNumerals(currentAyahIndex + 1)}/{toArabicNumerals(totalAyahs)}
-                </Text>
-              </View>
-
-              {/* Bookmark Toggle */}
-              <Pressable style={styles.heartButton} onPress={toggleBookmark}>
-                <Ionicons
-                  name={currentBookmarkId ? "bookmark" : "bookmark-outline"}
-                  size={28}
-                  color={currentBookmarkId ? theme.primary : theme.textSecondary}
-                />
-              </Pressable>
-
-              {/* Memorize Button */}
-              <Pressable
-                style={[styles.heartButton, { marginLeft: 16 }]}
-                onPress={async () => {
-                  import('../services').then(async (s) => {
-                    try {
-                      // V2 API is addItem(surah, ayah, page)
-                      await s.addItem(selectedSurah.number, currentAyah.number, currentAyah.page || 0);
-                      alert(`Surah ${selectedSurah.englishName} : Ayah ${currentAyah.number}\nadded to Hifz Journey.`);
-                    } catch (e) {
-                      alert('Error adding: ' + e.message);
-                    }
-                  });
-                }}
-              >
-                <Ionicons
-                  name="school-outline"
-                  size={28}
-                  color={theme.textSecondary}
-                />
-              </Pressable>
-
-              {/* Tafsir (Strict Mode) */}
-              <Pressable
-                style={[styles.heartButton, { marginLeft: 16 }]}
-                onPress={async () => {
-                  if (!isFeatureEnabled('tafsir')) {
-                    alert('Feature disabled');
-                    return;
-                  }
-                  setShowTafsir(true);
-                  setLoadingTafsir(true);
-                  try {
-                    // FIX: Use numberInSurah for correct lookup (1-relative)
-                    const ayahNum = currentAyah.numberInSurah || (currentAyahIndex + 1);
-                    console.log(`[Tafsir] Fetching for Surah ${selectedSurah.number} Ayah ${ayahNum}`);
-                    const data = await getTafsirForAyah(selectedSurah.number, ayahNum);
-                    setTafsirData(data); // Will be empty if unprovenanced
-                  } catch (e) {
-                    console.error(e);
-                  } finally {
-                    setLoadingTafsir(false);
-                  }
-                }}
-              >
-                <Ionicons name="book-outline" size={28} color={theme.textSecondary} />
-              </Pressable>
-
-              {/* Share (New) */}
-              <Pressable
-                style={[styles.heartButton, { marginLeft: 16 }]}
-                onPress={() => alert('Share Card generation coming soon')}
-              >
-                <Ionicons name="share-social-outline" size={28} color={theme.textSecondary} />
-              </Pressable>
-            </View>
-
-            {showDecorativeHeader && isFirstDisplayableAyah && (
-              <View style={[styles.basmalahContainer, styles.basmalahDecorative]}>
-                <ArabicText size="large" style={styles.basmalahText}>{BASMALAH_TEXT}</ArabicText>
-              </View>
-            )}
-
-            <View style={styles.arabicContainer}>
-              <ArabicText size="xlarge" style={styles.verseArabic}>
-                {ayahDisplayText}
-              </ArabicText>
-            </View>
-          </View>
-
-          {showTranslation && (
-            <View style={[styles.translationContainer, { backgroundColor: theme.background }]}>
-              <Text style={[styles.translationText, { color: theme.text }]}>
-                {translation}
-              </Text>
-            </View>
-          )}
-        </ScrollView>
-
-        <View style={[styles.bottomBar, { backgroundColor: theme.background, paddingBottom: insets.bottom }]}>
-          <Pressable
-            style={[styles.navButtonCircle, { opacity: isFirstDisplayableAyah ? 0.3 : 1 }]}
-            onPress={() => navigateAyah('prev')}
-            disabled={isFirstDisplayableAyah}
-          >
-            <Ionicons name="arrow-back" size={24} color={theme.primary} />
-          </Pressable>
-
-          <Pressable onPress={() => handleSurahSelect(null)}>
-            <Text style={[styles.doneButtonTextNew, { color: theme.primary }]}>{language === 'ar' ? 'تم' : "I'm Done"}</Text>
-          </Pressable>
-
-          <Pressable
-            style={[styles.navButtonCircle, { opacity: (isLastAyah && isLastSurah) ? 0.3 : 1 }]}
-            onPress={() => navigateAyah('next')}
-            disabled={isLastAyah && isLastSurah}
-          >
-            <Ionicons name="arrow-forward" size={24} color={theme.primary} />
-          </Pressable>
-        </View>
-      </View >
-    );
   };
 
-  const renderSurahList = () => (
-    <FlatList
-      data={surahs}
-      keyExtractor={(item) => item.number.toString()}
-      contentContainerStyle={[styles.listContainer, { paddingTop: insets.top + 10, paddingBottom: insets.bottom + 80 }]}
-      renderItem={({ item }) => (
-        <Pressable onPress={() => handleSurahSelect(item, shouldShowDecorativeHeaderAndSkipAyah1(item) ? 1 : 0)}>
-          <Card style={styles.surahCard}>
-            <View style={[styles.surahNumber, { backgroundColor: theme.primary + '15' }]}>
-              <Text style={[styles.surahNumberText, { color: theme.primary }]}>{item.number}</Text>
-            </View>
-            <View style={styles.surahInfo}>
-              <Text style={[styles.surahName, { color: theme.text }]}>{item.englishName}</Text>
-              <Text style={[styles.surahMeaning, { color: theme.textSecondary }]}>
-                {item.englishNameTranslation} • {item.numberOfAyahs} verses
-              </Text>
-            </View>
-            <View style={styles.surahArabic}>
-              <Text style={[styles.arabicName, { color: theme.arabicText }]}>{item.name}</Text>
-              <Text style={[styles.revelationType, { color: theme.textSecondary }]}>{item.revelationType}</Text>
-            </View>
-          </Card>
-        </Pressable>
-      )}
-    />
-  );
+  const fetchTafsir = async () => {
+    if (!isFeatureEnabled('tafsir')) return alert('Feature disabled');
+    setLoadingTafsir(true);
+    try {
+      const relativeAyahNumber = currentAyahIndex + 1;
+      // Use calculated relative number for Tafsir calls
+      const data = await getTafsirForAyah(selectedSurah.number, relativeAyahNumber);
+      setTafsirData(data[0] || { textEn: "No Tafsir available for this ayah." });
+    } catch (e) { console.error(e); }
+    finally { setLoadingTafsir(false); }
+  };
 
-  const renderStatsModal = () => (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={!!showStats}
-      onRequestClose={() => setShowStats(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent, { backgroundColor: theme.surface }]}>
-          <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
-            <Text style={[styles.modalTitle, { color: theme.text }]}>Quran Analytics</Text>
-            <Pressable onPress={() => setShowStats(false)}>
-              <Ionicons name="close" size={24} color={theme.text} />
-            </Pressable>
-          </View>
-          <View style={styles.statsGrid}>
-            <View style={[styles.statBox, { backgroundColor: theme.background }]}>
-              <Text style={[styles.statValue, { color: theme.primary }]}>{sessionMins}</Text>
-              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Mins Today</Text>
-            </View>
-            <View style={[styles.statBox, { backgroundColor: theme.background }]}>
-              <Text style={[styles.statValue, { color: theme.primary }]}>-</Text>
-              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Pages Today</Text>
-            </View>
-          </View>
-          <Text style={[styles.statsNote, { color: theme.textSecondary }]}>
-            Stats update automatically as you read.
-          </Text>
-        </View>
-      </View>
-    </Modal>
-  );
+  const navigateAyah = useCallback((dir) => {
+    if (!selectedSurah) return;
 
-  const renderTafsirModal = () => (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={showTafsir}
-      onRequestClose={() => setShowTafsir(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent, { backgroundColor: theme.surface, height: '60%' }]}>
-          <View style={[styles.modalHeader, { borderBottomColor: theme.border }]}>
-            <Text style={[styles.modalTitle, { color: theme.text }]}>Scholar Verified Tafsir</Text>
-            <Pressable onPress={() => setShowTafsir(false)}>
-              <Ionicons name="close" size={24} color={theme.text} />
-            </Pressable>
-          </View>
+    triggerHaptic('light', 'nav');
 
-          {loadingTafsir ? (
-            <ActivityIndicator size="large" color={theme.primary} style={{ marginTop: 40 }} />
-          ) : tafsirData.length === 0 ? (
-            <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1, padding: 20 }}>
-              <Ionicons name="shield-checkmark-outline" size={64} color={theme.textSecondary} style={{ marginBottom: 16, opacity: 0.5 }} />
-              <Text style={{ color: theme.text, fontSize: 18, fontWeight: 'bold', marginBottom: 8, textAlign: 'center' }}>
-                No Verified Content Available
-              </Text>
-              <Text style={{ color: theme.textSecondary, textAlign: 'center' }}>
-                We strictly display content only after scholar review and provenance verification.
-                No entries have been approved for this Ayah yet.
-              </Text>
-            </View>
-          ) : (
-            <ScrollView>
-              <View style={{ padding: 20 }}>
-                {tafsirData.map((item, index) => (
-                  <View key={index} style={{ marginBottom: 24, paddingBottom: 24, borderBottomWidth: 1, borderBottomColor: theme.border }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <Text style={{ color: theme.primary, fontWeight: 'bold' }}>{item.source}</Text>
-                      <Text style={{ color: theme.textSecondary, fontSize: 12 }}>{item.book}</Text>
-                    </View>
+    if (dir === 'next') {
+      if (currentAyahIndex < selectedSurah.ayahs.length - 1) {
+        setCurrentAyahIndex(p => p + 1);
+      } else {
+        // Next Surah Check
+        if (selectedSurah.number < 114) {
+          const nextSurah = surahs.find(s => s.number === selectedSurah.number + 1);
+          if (nextSurah) handleSurahSelect(nextSurah, 0);
+        }
+      }
+    } else {
+      if (currentAyahIndex > 0) {
+        setCurrentAyahIndex(p => p - 1);
+      } else {
+        // Prev Surah
+        const prevSurah = surahs.find(s => s.number === selectedSurah.number - 1);
+        if (prevSurah) {
+          // Go to last Ayah of previous Surah
+          handleSurahSelect(prevSurah, prevSurah.ayahs.length - 1);
+        }
+      }
+    }
+  }, [selectedSurah, currentAyahIndex, surahs, handleSurahSelect]);
 
-                    {/* Arabic Text */}
-                    <Text style={{
-                      fontSize: 18,
-                      color: theme.text,
-                      textAlign: 'right',
-                      lineHeight: 32,
-                      writingDirection: 'rtl',
-                      fontFamily: 'System'
-                    }}>
-                      {item.textAr}
-                    </Text>
+  // Gestures
+  const panResponder = useMemo(() => PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 30 && Math.abs(gestureState.dx) > Math.abs(gestureState.dy),
+    onPanResponderRelease: (_, gestureState) => {
+      const isRTL = I18nManager.isRTL;
+      // Swipe Left (dx < 0) -> Next (in LTR)
+      if (gestureState.dx < -50) navigateAyah(isRTL ? 'prev' : 'next');
+      // Swipe Right (dx > 0) -> Prev (in LTR)
+      else if (gestureState.dx > 50) navigateAyah(isRTL ? 'next' : 'prev');
+    },
+  }), [navigateAyah]);
 
-                    {/* English Text (if available) */}
-                    {item.textEn && (
-                      <Text style={{
-                        fontSize: 16,
-                        color: theme.text,
-                        marginTop: 12,
-                        lineHeight: 24
-                      }}>
-                        {item.textEn}
-                      </Text>
-                    )}
+  // --- RENDERERS ---
 
-                    <View style={{ flexDirection: 'row', marginTop: 12 }}>
-                      <View style={{ backgroundColor: theme.surface, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, marginRight: 8, borderWidth: 1, borderColor: theme.border }}>
-                        <Text style={{ fontSize: 10, color: theme.textSecondary }}>{item.authenticity || 'Verified'}</Text>
-                      </View>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </ScrollView>
-          )}
-        </View>
-      </View>
-    </Modal>
-  );
+  // --- RENDERERS ---
 
-  const renderSurahDetail = () => {
+  const renderHeader = () => {
+    // Only used when a surah is selected, otherwise we show list header
     if (!selectedSurah) return null;
 
     return (
-      <View style={styles.detail}>
-        <View style={[styles.topNavBar, { paddingTop: insets.top }]}>
-          <Pressable style={styles.topBackBtn} onPress={() => handleSurahSelect(null)}>
-            <Ionicons name="arrow-back" size={24} color={theme.text} />
-          </Pressable>
+      <View style={[styles.compactHeader, { paddingTop: insets.top, backgroundColor: theme.surface }]}>
+        <Pressable onPress={() => handleSurahSelect(null)} style={styles.iconBtn}>
+          <Ionicons name="arrow-back" size={24} color={theme.text} />
+        </Pressable>
 
-          <View style={[styles.topIconsPill, { backgroundColor: theme.surface }]}>
-            {/* Bookmark Icon */}
-            <Pressable onPress={() => navigation.navigate('Bookmarks')}>
-              <Ionicons name="bookmarks" size={20} color={theme.primary} style={{ marginHorizontal: 4 }} />
-            </Pressable>
-          </View>
-
-          <Pressable style={styles.topSettingsBtn} onPress={() => navigation.navigate('Settings')}>
-            <Ionicons name="settings-outline" size={24} color={theme.text} />
-          </Pressable>
+        <View style={styles.headerTitle}>
+          <Text style={[styles.headerSurah, { color: theme.text }]}>
+            Surah {selectedSurah.number} — {selectedSurah.englishName}
+          </Text>
+          {juzProgress && (
+            <Text style={{ color: theme.textSecondary, fontSize: 12, marginTop: 2 }}>
+              {formatJuzProgress(juzProgress, language)}
+            </Text>
+          )}
         </View>
 
-        {renderVerseMode()}
+        <View style={styles.headerActions}>
+          <Pressable onPress={() => setShowAudioSheet(true)} style={styles.iconBtn}>
+            <Ionicons name="mic-outline" size={22} color={theme.text} />
+          </Pressable>
+          <Pressable onPress={toggleBookmark} style={styles.iconBtn}>
+            <Ionicons name={currentBookmarkId ? "bookmark" : "bookmark-outline"} size={22} color={currentBookmarkId ? theme.primary : theme.text} />
+          </Pressable>
+        </View>
       </View>
     );
   };
 
+  if (!selectedSurah) {
+    return (
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <View style={[styles.compactHeader, { paddingTop: insets.top }]}>
+          <Text style={[styles.headerSurah, { color: theme.text, fontSize: 24, marginLeft: 16 }]}>Quran Reader</Text>
+        </View>
+        <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+          {surahs.map(s => (
+            <Pressable key={s.number} onPress={() => handleSurahSelect(s)} style={[styles.surahItem, { borderBottomColor: theme.border }]}>
+              <View style={[styles.surahBadge, { backgroundColor: theme.primary + '20' }]}>
+                <Text style={{ color: theme.primary, fontWeight: 'bold' }}>{s.number}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: theme.text, fontWeight: 'bold' }}>{s.englishName}</Text>
+                <Text style={{ color: theme.textSecondary, fontSize: 12 }}>{s.englishNameTranslation}</Text>
+              </View>
+              <Text style={{ color: theme.text, fontFamily: 'System', fontSize: 18 }}>{s.name}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  }
+
+  const currentAyah = selectedSurah.ayahs[currentAyahIndex];
+  // Get translation
+  const surahTrans = translations[selectedSurah.number] || [];
+  const transText = surahTrans.find(t => t.number === currentAyah.number)?.text || '';
+
+  // Calculate if footer should be relative or absolute based on content?
+  // Easier: Just give padding to ScrollView and let it scroll BEHIND the footer if footer is absolute,
+  // OR make footer part of the column.
+  // User complained about overlap. Let's make footer static at bottom but Ensure Reader scrolls properly.
+
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {!selectedSurah && (
-        <View style={styles.header}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <View>
-              <Text style={[styles.title, { color: theme.text }]}>Quran</Text>
-              <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-                {surahs.length} Surahs • Tanzil.net
-              </Text>
+      {renderHeader()}
+
+      {/* Reader Container - Now a View wrapping ScrollView for constraints */}
+      <View style={styles.readerContainer} {...panResponder.panHandlers}>
+        {/* Using ScrollView to handle long translations/tafsir */}
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} showsVerticalScrollIndicator={false}>
+          <Pressable style={{ flex: 1 }} onPress={() => { /* consume taps outside card */ }}>
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <VerseCard
+                surah={selectedSurah}
+                ayah={currentAyah}
+                ayahNumber={currentAyahIndex + 1}
+                totalAyahs={selectedSurah.ayahs.length}
+                translation={transText}
+                onToggleControls={() => { triggerHaptic('light', 'tap'); setShowAudioSheet(prev => !prev); }}
+                isPlaying={isPlaying}
+                onPlay={playAyah}
+                isBookmarked={!!currentBookmarkId}
+                onBookmark={toggleBookmark}
+                onTafsir={fetchTafsir}
+                tafsirData={tafsirData}
+                onAddToHifz={handleAddToHifz}
+              />
             </View>
-            <View style={{ flexDirection: 'row' }}>
-              <Pressable
-                style={[styles.statsButton, { backgroundColor: theme.primary + '15', marginRight: 8 }]}
-                onPress={() => navigation.navigate('Bookmarks')}
-              >
-                <Ionicons name="bookmarks" size={24} color={theme.primary} />
-              </Pressable>
-              <Pressable
-                style={[styles.statsButton, { backgroundColor: theme.primary + '15' }]}
-                onPress={() => setShowStats(true)}
-              >
-                <Ionicons name="stats-chart" size={24} color={theme.primary} />
-              </Pressable>
+          </Pressable>
+        </ScrollView>
+      </View>
+
+      {/* Navigation Footer (if not using swipe only) */}
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
+        <Pressable onPress={() => navigateAyah('prev')} disabled={currentAyahIndex === 0 && selectedSurah.number === 1}>
+          <Ionicons name="chevron-back" size={32} color={currentAyahIndex === 0 && selectedSurah.number === 1 ? theme.textSecondary + '40' : theme.primary} />
+        </Pressable>
+        <Text style={{ color: theme.textSecondary, fontSize: 12 }}>Swipe or Tap to Navigate</Text>
+        <Pressable onPress={() => navigateAyah('next')} disabled={selectedSurah.number === 114 && currentAyahIndex === selectedSurah.ayahs.length - 1}>
+          <Ionicons name="chevron-forward" size={32} color={selectedSurah.number === 114 && currentAyahIndex === selectedSurah.ayahs.length - 1 ? theme.textSecondary + '40' : theme.primary} />
+        </Pressable>
+      </View>
+
+      <AudioBottomSheet
+        visible={showAudioSheet}
+        onClose={() => setShowAudioSheet(false)}
+        isPlaying={isPlaying}
+        onPlayPause={playAyah}
+        onStop={() => { if (sound) sound.stopAsync(); setIsPlaying(false); }}
+        onAnalyticsPress={() => setShowStatsModal(true)}
+        onRelatedPress={() => alert('Related Hadith/Adhkar coming soon')}
+      />
+
+      {/* Analytics Modal (Legacy for now) */}
+      <Modal visible={showStatsModal} transparent animationType="fade" onRequestClose={() => setShowStatsModal(false)}>
+        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }} onPress={() => setShowStatsModal(false)}>
+          <View style={{ backgroundColor: theme.surface, padding: 24, borderRadius: 16, width: '80%' }}>
+            <Text style={{ color: theme.text, fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>Reading Analytics</Text>
+            <Text style={{ color: theme.text, fontSize: 16 }}>Minutes Today: {sessionMins}</Text>
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* Toast Notification */}
+      {
+        toastMessage && (
+          <View style={styles.toastContainer}>
+            <View style={[styles.toast, { backgroundColor: theme.surface }]}>
+              <Ionicons name="checkmark-circle" size={24} color={theme.primary} />
+              <Text style={[styles.toastText, { color: theme.text }]}>{toastMessage}</Text>
             </View>
           </View>
-        </View>
-      )}
+        )
+      }
 
-      {selectedSurah ? renderSurahDetail() : renderSurahList()}
-      {renderStatsModal()}
-      {renderTafsirModal()}
-    </View>
+    </View >
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { padding: 20, paddingBottom: 10, paddingTop: 60 },
-  title: { fontSize: 28, fontWeight: 'bold' },
-  subtitle: { fontSize: 14, marginTop: 4 },
-  listContainer: { padding: 16 },
-  surahCard: { flexDirection: 'row', alignItems: 'center', padding: 16, marginBottom: 12 },
-  surahNumber: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
-  surahNumberText: { fontSize: 14, fontWeight: 'bold' },
-  surahInfo: { flex: 1 },
-  surahName: { fontSize: 16, fontWeight: '600' },
-  surahMeaning: { fontSize: 13, marginTop: 2 },
-  surahArabic: { alignItems: 'flex-end' },
-  arabicName: { fontSize: 20, fontFamily: 'System' },
-  revelationType: { fontSize: 11, marginTop: 4 },
-  detail: { flex: 1 },
-
-  // Top Navigation Bar
-  topNavBar: {
-    minHeight: 60,
-    paddingBottom: 12,
+  compactHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
     zIndex: 10,
   },
-  topBackBtn: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.05)' },
-  topIconsPill: { flexDirection: 'row', alignItems: 'center', height: 40, borderRadius: 20, paddingHorizontal: 12, minWidth: 60, justifyContent: 'center' },
-  topSettingsBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' },
+  headerTitle: { alignItems: 'center' },
+  headerSurah: { fontSize: 16, fontWeight: 'bold' },
+  headerActions: { flexDirection: 'row', gap: 12 },
+  iconBtn: { padding: 4 },
 
-  verseModeContainer: { flex: 1 },
-  progressSection: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 20, marginTop: 10 },
-  progressTextLeft: { fontSize: 16, fontWeight: '500' },
-  progressTextCenter: { fontSize: 12, color: '#666' },
-  progressTextRight: { fontSize: 16, fontWeight: '500' },
+  readerContainer: { flex: 1, justifyContent: 'center' },
 
-  verseScrollView: { flex: 1 },
-  verseCard: { marginHorizontal: 16, borderRadius: 24, padding: 24, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 16, elevation: 4 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, height: 48 },
-  playPill: { flexDirection: 'row', alignItems: 'center', height: 40, borderRadius: 20, borderWidth: 1, paddingHorizontal: 12 },
-  surahTitleContainer: { alignItems: 'center' },
-  surahTitlePill: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, marginBottom: 4 },
-  surahTitleText: { color: 'white', fontWeight: 'bold', fontSize: 14 },
-  ayahCountText: { fontSize: 12, fontWeight: '600' },
-  heartButton: { alignItems: 'center', justifyContent: 'center' },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
 
-  basmalahContainer: { alignItems: 'center', marginBottom: 16 },
-  basmalahText: { textAlign: 'center' },
-  basmalahDecorative: { paddingVertical: 16, paddingHorizontal: 24 },
-  arabicContainer: { width: '100%', alignItems: 'center', marginVertical: 10 },
-  verseArabic: { textAlign: 'center', lineHeight: 60 },
-  translationContainer: { padding: 20, marginTop: 16, marginHorizontal: 16, borderRadius: 16 },
-  translationText: { fontSize: 16, lineHeight: 24, textAlign: 'center' },
-  bottomBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 40, paddingTop: 20 },
-  navButtonCircle: { width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(0,0,0,0.05)', justifyContent: 'center', alignItems: 'center' },
-  doneButtonTextNew: { fontSize: 16, fontWeight: '600' },
+  listHeader: { padding: 20 },
+  listTitle: { fontSize: 24, fontWeight: 'bold' },
+  surahItem: { flexDirection: 'row', padding: 16, borderBottomWidth: 1, alignItems: 'center' },
+  surahBadge: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
 
-  statsButton: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  modalContent: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, minHeight: 400 },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 16, borderBottomWidth: 1, marginBottom: 20 },
-  modalTitle: { fontSize: 20, fontWeight: 'bold' },
-  statsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  statBox: { width: '48%', borderRadius: 16, padding: 16, marginBottom: 16, alignItems: 'center' },
-  statValue: { fontSize: 32, fontWeight: 'bold', marginBottom: 4 },
-  statLabel: { fontSize: 14 },
-  statsNote: { textAlign: 'center', fontSize: 12, marginTop: 20 }
+  toastContainer: {
+    position: 'absolute',
+    top: 100,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 100,
+  },
+  toast: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 30,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    gap: 10
+  },
+  toastText: {
+    fontWeight: '600',
+    fontSize: 14
+  }
 });
 
 export default QuranScreen;

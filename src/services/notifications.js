@@ -28,34 +28,48 @@ export const setupNotificationChannel = async () => {
   }
 };
 
-// Request permissions
+// Request permissions with diagnostics
 export const requestNotificationPermissions = async () => {
   try {
-    // Skip push notification setup in Expo Go (not supported in SDK 53+)
+    console.log('[Notifications] Requesting permissions...');
+
     if (isExpoGo) {
-      console.log('[Notifications] Running in Expo Go - skipping push setup');
-      return true; // Return true to not break callers
+      console.log('[Notifications] Running in Expo Go - push notifications limited, local allowed.');
     }
 
     // Setup Android channel first
     await setupNotificationChannel();
 
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    console.log(`[Notifications] Existing status: ${existingStatus}`);
+
     let finalStatus = existingStatus;
 
     if (existingStatus !== 'granted') {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
+      console.log(`[Notifications] New status: ${finalStatus}`);
     }
 
     if (finalStatus !== 'granted') {
-      console.log('Notification permissions not granted');
+      console.log('[Notifications] Permissions not granted!');
       return false;
+    }
+
+    // Get Token for diagnostics (even if not sending to server yet)
+    // In Expo Go, getExpoPushTokenAsync might fail if not logged in or project ID missing
+    if (!isExpoGo) {
+      try {
+        const tokenData = await Notifications.getExpoPushTokenAsync();
+        console.log('[Notifications] Expo Push Token:', tokenData.data);
+      } catch (e) {
+        console.log('[Notifications] Failed to get push token (expected in local dev if no project ID):', e.message);
+      }
     }
 
     return true;
   } catch (error) {
-    console.error('Error requesting notification permissions:', error);
+    console.error('[Notifications] Error requesting notification permissions:', error);
     return false;
   }
 };

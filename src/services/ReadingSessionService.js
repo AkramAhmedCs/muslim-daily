@@ -1,137 +1,91 @@
 import { writeQuery, readFirstQuery } from './DatabaseService';
-import { AppState } from 'react-native';
-import * as Crypto from 'expo-crypto';
 
-// Constants
-const MAX_SESSION_DURATION = 4 * 60 * 60; // 4 hours in seconds
-const HEARTBEAT_INTERVAL = 60000; // 1 minute
+const SESSION_CAP_MINUTES = 120;
 
-// In-memory state
 let currentSessionId = null;
-let heartbeatTimer = null;
-let sessionStartTime = null;
+let sessionTimer = null;
 
-const getUUID = () => Crypto.randomUUID();
-const getISO = () => new Date().toISOString();
-
-export const startSession = async ({ surah, ayah, source = 'verse_reader' }) => {
+// Start a new session
+export const startSession = async ({ surah, ayah, source }) => {
   if (currentSessionId) {
     await endSession();
   }
 
-  try {
-    const id = getUUID();
-    const startAt = getISO();
+  const id = new Date().getTime().toString();
+  const startAt = new Date().toISOString();
 
-    // Use writeQuery
+  try {
     await writeQuery(
-      `INSERT INTO reading_sessions (id, start_at, surah_start, ayah_start, source, status) 
-       VALUES (?, ?, ?, ?, ?, 'active')`,
-      [id, startAt, surah, ayah, source]
+      `INSERT INTO reading_sessions (id, start_at, start_surah, start_ayah, source, created_at) 
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [id, startAt, surah, ayah, source, startAt]
     );
 
     currentSessionId = id;
-    sessionStartTime = Date.now();
 
-    startHeartbeat();
+    // Safety timer: Cap at 120 mins
+    if (sessionTimer) clearTimeout(sessionTimer);
+    sessionTimer = setTimeout(() => {
+      console.warn('[ReadingSession] Force closing session > 120m');
+      endSession();
+    }, SESSION_CAP_MINUTES * 60 * 1000);
 
-    console.log('[Session] Started:', id);
-    return id;
-  } catch (error) {
-    console.error('[Session] Start Error:', error);
-    return null;
+    console.log(`[ReadingSession] Started: ${id}`);
+  } catch (e) {
+    console.error('[ReadingSession] Start failed', e);
   }
 };
 
-const startHeartbeat = () => {
-  if (heartbeatTimer) clearInterval(heartbeatTimer);
+// End current session
+export const endSession = async (endSurah = null, endAyah = null) => {
+  if (!currentSessionId) return;
 
-  heartbeatTimer = setInterval(async () => {
-    if (!currentSessionId) {
-      clearInterval(heartbeatTimer);
-      return;
-    }
+  const endAt = new Date().toISOString();
+  const id = currentSessionId;
 
-    try {
-      const now = getISO();
-      const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+  try {
+    // Calculate duration
+    const row = await readFirstQuery(`SELECT start_at FROM reading_sessions WHERE id = ?`, [id]);
+    if (row) {
+      const startDate = new Date(row.start_at);
+      const endDate = new Date(endAt);
+      let duration = Math.floor((endDate - startDate) / 1000); // seconds
 
-      if (elapsed > MAX_SESSION_DURATION) {
-        console.warn('[Session] Max duration exceeded, force closing');
-        await endSession();
-        return;
+      // Cap logic
+      if (duration > SESSION_CAP_MINUTES * 60) {
+        duration = SESSION_CAP_MINUTES * 60;
       }
 
       await writeQuery(
-        `UPDATE reading_sessions 
-         SET end_at = ?, duration_seconds = ? 
-         WHERE id = ?`,
-        [now, elapsed, currentSessionId]
+        `UPDATE reading_sessions SET end_at = ?, end_surah = ?, end_ayah = ?, duration_seconds = ? WHERE id = ?`,
+        [endAt, endSurah, endAyah, duration, id]
       );
-    } catch (e) {
-      console.error('[Session] Heartbeat Error:', e);
+      console.log(`[ReadingSession] Ended: ${id}, Duration: ${duration}s`);
     }
-  }, HEARTBEAT_INTERVAL);
-};
-
-export const endSession = async (finalSurah = null, finalAyah = null) => {
-  if (!currentSessionId) return;
-
-  if (heartbeatTimer) {
-    clearInterval(heartbeatTimer);
-    heartbeatTimer = null;
-  }
-
-  try {
-    const endAt = getISO();
-    const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
-    const id = currentSessionId;
-
+  } catch (e) {
+    console.error('[ReadingSession] End failed', e);
+  } finally {
     currentSessionId = null;
-    sessionStartTime = null;
-
-    const query = `
-      UPDATE reading_sessions 
-      SET end_at = ?, 
-          duration_seconds = ?, 
-          status = 'completed'
-          ${finalSurah ? ', surah_end = ?, ayah_end = ?' : ''}
-      WHERE id = ?
-    `;
-
-    const params = finalSurah
-      ? [endAt, elapsed, finalSurah, finalAyah, id]
-      : [endAt, elapsed, id];
-
-    await writeQuery(query, params);
-
-    console.log('[Session] Ended:', id, 'Duration:', elapsed);
-
-  } catch (error) {
-    console.error('[Session] End Error:', error);
+    if (sessionTimer) clearTimeout(sessionTimer);
   }
 };
 
+// Get today's reading minutes
 export const getTodayReadingMinutes = async () => {
   try {
-    const result = await readFirstQuery(
-      `SELECT SUM(duration_seconds) as total_seconds 
-             FROM reading_sessions 
-             WHERE date(start_at) = date('now', 'localtime')`
-    );
+    const result = await readFirstQuery(`
+            SELECT SUM(duration_seconds) as totalSecs 
+            FROM reading_sessions 
+            WHERE date(start_at, 'localtime') = date('now', 'localtime')
+        `);
 
-    // result is object or null. result.total_seconds is value.
-    const seconds = result ? result.total_seconds : 0;
-    return Math.floor((seconds || 0) / 60);
-  } catch (error) {
-    console.error('[Session] Get Stats Error:', error);
+    const secs = result?.totalSecs || 0;
+    const mins = Math.floor(secs / 60);
+
+    if (mins > 600) return 600;
+    return mins;
+  } catch (e) {
+    console.error(e);
     return 0;
   }
 };
-
-AppState.addEventListener('change', (nextAppState) => {
-  if (nextAppState.match(/inactive|background/) && currentSessionId) {
-    console.log('[Session] App backgrounded, ending session...');
-    endSession();
-  }
-});
