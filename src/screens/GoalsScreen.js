@@ -6,6 +6,8 @@ import { createPlan, getGoalsDashboard } from '../services/GoalsService';
 import { useFocusEffect } from '@react-navigation/native';
 import { haptics } from '../services/HapticsService';
 import { ChecklistItem } from '../components'; // Reuse checklist item for consistency
+import DatePicker from '../components/DatePicker';
+import { formatDateForStorage, parseStoredDate } from '../utils/dateHelpers';
 
 const GoalsScreen = ({ navigation }) => {
   const { theme } = useTheme();
@@ -130,13 +132,13 @@ const GoalsScreen = ({ navigation }) => {
           </>
         ) : (
           <>
-            <Text style={[styles.label, { color: theme.text }]}>Target Date (YYYY-MM-DD)</Text>
-            <TextInput
-              style={[styles.input, { color: theme.text, borderColor: theme.border }]}
-              value={targetValue}
-              onChangeText={setTargetValue}
-              placeholder="2024-12-31"
-              placeholderTextColor={theme.textSecondary}
+            <Text style={[styles.label, { color: theme.text }]}>Target Date</Text>
+            <DatePicker
+              value={parseStoredDate(targetValue.includes('-') ? targetValue : new Date().toISOString().split('T')[0])}
+              onChange={(date) => setTargetValue(formatDateForStorage(date))}
+              minimumDate={new Date()}
+              label={null} // We already have a label above
+              theme={theme}
             />
             <Text style={[styles.hint, { color: theme.textSecondary }]}>
               We'll calculate daily pages needed.

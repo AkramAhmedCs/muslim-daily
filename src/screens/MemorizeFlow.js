@@ -42,12 +42,15 @@ const MemorizeFlow = ({ route, navigation }) => {
   const [stage, setStage] = useState(STAGE_PREP);
   const [loading, setLoading] = useState(true);
   const [audioUri, setAudioUri] = useState(null);
-  const [sound, setSound] = useState();
+  const [sound, setSound] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [recallMode, setRecallMode] = useState(RECALL_TYPE_GAP_FILL);
   const [userInput, setUserInput] = useState('');
   const [recallAttempts, setRecallAttempts] = useState(0);
   const [showHint, setShowHint] = useState(false);
+
+  // Ref to prevent rapid-press race conditions
+  const audioOperationInProgress = useRef(false);
 
   // --- EFFECT HOOKS ---
 
@@ -120,6 +123,7 @@ const MemorizeFlow = ({ route, navigation }) => {
       return () => {
         if (sound) {
           sound.unloadAsync();
+          setSound(null); // Clear sound reference
           setIsPlaying(false);
         }
       };
@@ -143,6 +147,7 @@ const MemorizeFlow = ({ route, navigation }) => {
     setLoading(true);
     setAudioUri(null);
     setIsPlaying(false);
+    setSound(null); // Clear stale sound reference
     setRecallMode(RECALL_TYPE_GAP_FILL);
     setUserInput('');
     setRecallAttempts(0);
@@ -166,27 +171,59 @@ const MemorizeFlow = ({ route, navigation }) => {
 
   // --- ACTIONS ---
   const playAudio = async (loop = false) => {
-    if (sound) await sound.unloadAsync();
+    // Prevent rapid-press race conditions
+    if (audioOperationInProgress.current) return;
+    audioOperationInProgress.current = true;
+
+    // Set playing state FIRST to update UI immediately
+    setIsPlaying(true);
+
     try {
+      // Unload previous sound if exists
+      if (sound) {
+        try {
+          await sound.unloadAsync();
+          setSound(null);
+        } catch (e) {
+          // Ignore unload errors
+        }
+      }
+
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: audioUri },
         { shouldPlay: true, isLooping: loop }
       );
       setSound(newSound);
-      setIsPlaying(true);
+
       newSound.setOnPlaybackStatusUpdate(status => {
-        if (status.didJustFinish && !loop) {
+        // Only update if playback finished naturally (not by user action)
+        if (status.isLoaded && status.didJustFinish && !loop) {
           setIsPlaying(false);
         }
       });
     } catch (e) {
       console.error('Play failed', e);
+      setIsPlaying(false); // Reset on error
+    } finally {
+      audioOperationInProgress.current = false;
     }
   };
 
   const stopAudio = async () => {
-    if (sound) await sound.stopAsync();
-    setIsPlaying(false);
+    // Prevent rapid-press race conditions
+    if (audioOperationInProgress.current) return;
+    audioOperationInProgress.current = true;
+
+    setIsPlaying(false); // Update UI immediately
+    if (sound) {
+      try {
+        await sound.stopAsync();
+      } catch (e) {
+        // Ignore stop errors
+      }
+    }
+
+    audioOperationInProgress.current = false;
   };
 
   const checkFirstWords = () => {
@@ -249,9 +286,9 @@ const MemorizeFlow = ({ route, navigation }) => {
       <Text style={[styles.title, { color: theme.text }]}>Memorize</Text>
       <Text style={[styles.subtitle, { color: theme.primary }]}>{surahName} {activeItem.surah}:{activeItem.ayah}</Text>
       <View style={styles.spacer} />
-      <Pressable style={[styles.btn, { backgroundColor: theme.surface }]} onPress={() => playAudio(false)}>
-        <Ionicons name="play" size={32} color={theme.primary} />
-        <Text style={[styles.btnText, { color: theme.primary }]}>Preview Audio</Text>
+      <Pressable style={[styles.btn, { backgroundColor: theme.surface }]} onPress={() => isPlaying ? stopAudio() : playAudio(false)}>
+        <Ionicons name={isPlaying ? "pause" : "play"} size={32} color={theme.primary} />
+        <Text style={[styles.btnText, { color: theme.primary }]}>{isPlaying ? 'Stop' : 'Preview Audio'}</Text>
       </Pressable>
       <View style={styles.spacer} />
       <Pressable style={[styles.btn, { backgroundColor: theme.primary }]} onPress={() => setStage(STAGE_READ)}>
@@ -265,9 +302,9 @@ const MemorizeFlow = ({ route, navigation }) => {
       <Text style={[styles.instruction, { color: theme.textSecondary }]}>Read & Listen</Text>
       <ArabicText size="xlarge" style={styles.arabicText}>{ayahText}</ArabicText>
       <View style={styles.spacer} />
-      <Pressable style={[styles.btn, { backgroundColor: theme.surface }]} onPress={() => playAudio(false)}>
+      <Pressable style={[styles.btn, { backgroundColor: theme.surface }]} onPress={() => isPlaying ? stopAudio() : playAudio(false)}>
         <Ionicons name={isPlaying ? "pause" : "play"} size={24} color={theme.primary} />
-        <Text style={[styles.btnText, { color: theme.primary }]}>{isPlaying ? 'Pause' : 'Listen'}</Text>
+        <Text style={[styles.btnText, { color: theme.primary }]}>{isPlaying ? 'Stop' : 'Listen'}</Text>
       </Pressable>
       <View style={styles.spacer} />
       <Pressable style={[styles.btn, { backgroundColor: theme.primary }]} onPress={() => setStage(STAGE_SHADOW)}>
@@ -318,7 +355,7 @@ const MemorizeFlow = ({ route, navigation }) => {
       <Text style={[styles.instruction, { color: theme.textSecondary }]}>Self-Assessment</Text>
       <View style={styles.spacer} />
       <View style={styles.gradeContainer}>
-        <Pressable style={[styles.gradeBtn, { backgroundColor: theme.error }]} onPress={() => handleGrade(0)}>
+        <Pressable style={[styles.gradeBtn, { backgroundColor: '#D32F2F' }]} onPress={() => handleGrade(0)}>
           <Text style={styles.gradeLabel}>Again</Text>
           <Text style={styles.gradeSub}>Forgot</Text>
         </Pressable>

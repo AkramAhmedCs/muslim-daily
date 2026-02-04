@@ -48,7 +48,13 @@ export const addItem = async (surah, ayah, page = 0) => {
       [surah, ayah]
     );
     if (existing) {
-      console.log('[MemorizationService] Item exists:', existing.id);
+      console.log('[MemorizationService] Item exists, resetting to due now:', existing.id);
+      // Reset nextReviewAt so item is due immediately (allows re-practice)
+      const now = getISO();
+      await writeQuery(
+        `UPDATE memorization SET nextReviewAt = ?, updatedAt = ? WHERE id = ?`,
+        [now, now, existing.id]
+      );
       return existing.id;
     }
 
