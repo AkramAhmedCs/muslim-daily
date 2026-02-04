@@ -68,3 +68,13 @@ export const isBookmarked = async (surah, ayah) => {
     return null;
   }
 };
+
+export const clearAllBookmarks = async () => {
+  try {
+    await writeQuery(`DELETE FROM bookmarks`);
+    return true;
+  } catch (error) {
+    console.error('[Bookmark] Clear All Error:', error);
+    return false;
+  }
+};

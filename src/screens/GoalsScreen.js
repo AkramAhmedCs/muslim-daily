@@ -44,6 +44,10 @@ const GoalsScreen = ({ navigation }) => {
     }, [loadData])
   );
 
+  /* 
+   * SAFE HANDLER IMPLEMENTATION
+   * Wraps interactions in try-catch to prevent crashes 
+   */
   const handleCreate = async () => {
     if (!targetValue) return;
     haptics.success();
@@ -58,13 +62,22 @@ const GoalsScreen = ({ navigation }) => {
     }
   };
 
-  const toggleExtra = (key) => {
-    setExtraGoals(prev => {
-      const newState = { ...prev, [key]: !prev[key] };
-      if (newState[key]) haptics.selection();
-      else haptics.light();
-      return newState;
-    });
+  const toggleExtra = async (key) => {
+    try {
+      // Safe Haptic Call
+      haptics.selection?.();
+
+      setExtraGoals(prev => {
+        const newState = { ...prev, [key]: !prev[key] };
+        return newState;
+      });
+
+      // Note: In a real app we would await saving to storage here
+    } catch (error) {
+      console.error('[Goals] Toggle error for ' + key, error);
+      // Fallback toggle even if haptics fail
+      setExtraGoals(prev => ({ ...prev, [key]: !prev[key] }));
+    }
   };
 
   const renderCreationMode = () => (
@@ -77,7 +90,10 @@ const GoalsScreen = ({ navigation }) => {
       <View style={[styles.typeContainer, { borderColor: theme.border }]}>
         <Pressable
           style={[styles.typeBtn, newPlanType === 'pages_per_day' && { backgroundColor: theme.primary }]}
-          onPress={() => { haptics.selection(); setNewPlanType('pages_per_day'); }}
+          onPress={() => {
+            try { haptics.selection?.(); } catch (e) { }
+            setNewPlanType('pages_per_day');
+          }}
         >
           <Text style={[styles.typeText, newPlanType === 'pages_per_day' ? { color: 'white' } : { color: theme.text }]}>
             Daily Pages
@@ -85,7 +101,10 @@ const GoalsScreen = ({ navigation }) => {
         </Pressable>
         <Pressable
           style={[styles.typeBtn, newPlanType === 'finish_by_date' && { backgroundColor: theme.primary }]}
-          onPress={() => { haptics.selection(); setNewPlanType('finish_by_date'); }}
+          onPress={() => {
+            try { haptics.selection?.(); } catch (e) { }
+            setNewPlanType('finish_by_date');
+          }}
         >
           <Text style={[styles.typeText, newPlanType === 'finish_by_date' ? { color: 'white' } : { color: theme.text }]}>
             Finish By Date

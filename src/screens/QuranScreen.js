@@ -284,6 +284,9 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
         </View>
 
         <View style={styles.headerActions}>
+          <Pressable onPress={() => navigation.navigate('Bookmarks')} style={styles.iconBtn}>
+            <Ionicons name="list" size={24} color={theme.text} />
+          </Pressable>
           <Pressable onPress={() => setShowAudioSheet(true)} style={styles.iconBtn}>
             <Ionicons name="mic-outline" size={22} color={theme.text} />
           </Pressable>

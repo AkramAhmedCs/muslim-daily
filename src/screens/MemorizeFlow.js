@@ -10,6 +10,11 @@ import { getPlayableUrl, recordAttempt, addItem } from '../services';
 import { normalizeArabicText } from '../utils/textProcessing';
 import { Audio } from 'expo-av';
 import quranData from '../../data/quran_full.json';
+import {
+  isValidMemorizedVerse,
+  getSurahNumber,
+  getAyahNumber
+} from '../constants/HifzStructures';
 
 // --- STAGES ---
 const STAGE_PREP = 0;
@@ -28,33 +33,61 @@ const MemorizeFlow = ({ route, navigation }) => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
-  // Normalize Params (handle both Queue Mode and Single Verse Mode)
+  // Normalize Params
   const params = route.params || {};
-  // The original `item` is now `initialItem` from route params, and `dbItem` will be the active item.
   const { item: initialItem, queueLength = 1, currentIndex = 0 } = params;
 
-  // State for the actual item being memorized, potentially from DB
+  // --- STATE HOOKS (Hoisted to top) ---
   const [dbItem, setDbItem] = useState(null);
+  const [stage, setStage] = useState(STAGE_PREP);
+  const [loading, setLoading] = useState(true);
+  const [audioUri, setAudioUri] = useState(null);
+  const [sound, setSound] = useState();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [recallMode, setRecallMode] = useState(RECALL_TYPE_GAP_FILL);
+  const [userInput, setUserInput] = useState('');
+  const [recallAttempts, setRecallAttempts] = useState(0);
+  const [showHint, setShowHint] = useState(false);
 
-  // 1. Initialize Item (Auto-Add to DB if direct navigation)
+  // --- EFFECT HOOKS ---
+
+  // 1. Validate on Mount
+  useEffect(() => {
+    const validateVerseData = () => {
+      if (!initialItem && !params.surah) return true;
+      if (initialItem) {
+        if (!isValidMemorizedVerse(initialItem)) {
+          console.error('[MemorizeFlow] Invalid verse data structure:', initialItem);
+          Alert.alert(
+            'Invalid Verse Data',
+            'This verse data is corrupted or incomplete. Please remove it from your memorization list.',
+            [{ text: 'OK', onPress: () => navigation.goBack() }]
+          );
+          return false;
+        }
+      }
+      return true;
+    };
+    validateVerseData();
+  }, [initialItem, params, navigation]);
+
+  // 2. Initialize Item
   useEffect(() => {
     const init = async () => {
       try {
-        // Already have a full item?
+        // A. Already have a full item?
         if (initialItem && initialItem.id && !initialItem.id.startsWith('temp')) {
           setDbItem(initialItem);
           setLoading(false);
           return;
         }
 
-        // Direct navigation: Params but no full item
+        // B. Direct navigation: Params but no full item
         if (params.surah && params.ayah) {
           const s = parseInt(params.surah);
           const a = parseInt(params.ayah);
-
           console.log('[MemorizeFlow] Auto-adding item:', s, a);
 
-          // Add to DB or get existing ID (with timeout)
           const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Database init timed out')), 5000)
           );
@@ -64,88 +97,45 @@ const MemorizeFlow = ({ route, navigation }) => {
             timeoutPromise
           ]);
 
-          // Construct full object
           setDbItem({
             id,
             surah: s,
             ayah: a,
-            status: 'learning' // Default
+            status: 'learning'
           });
-        } else {
-          // No params?
-          console.error('[MemorizeFlow] Missing surah/ayah params');
         }
       } catch (e) {
         console.error('[MemorizeFlow] Init failed', e);
         Alert.alert('Error', 'Failed to load memorization item: ' + e.message);
-        // Fallback: allow preview but disable grading? Or just go back?
-        // For now, let's stop loading so they see the screen, but maybe grading will fail.
       } finally {
         setLoading(false);
       }
     };
-
     init();
   }, [initialItem, params.surah, params.ayah]);
 
-  console.log('[MemorizeFlow] Params:', JSON.stringify(params));
+  // 3. Cleanup Audio on Unfocus
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        if (sound) {
+          sound.unloadAsync();
+          setIsPlaying(false);
+        }
+      };
+    }, [sound])
+  );
 
-  // Fallback: If navigating from Reader, we just get { surah, ayah }
-  // This block is now largely superseded by the useEffect above, but kept for clarity if `dbItem` is not yet set.
-  // The `item` variable here is now `dbItem` for the rest of the component's logic.
-  let activeItem = dbItem; // Use dbItem as the primary source for the active item
-
+  // 4. Load Audio when Item Changes
+  // Determine active item safely
+  let activeItem = dbItem;
   if (!activeItem && params.surah && params.ayah) {
-    const s = parseInt(params.surah);
-    const a = parseInt(params.ayah);
-
-    // Construct temp item if dbItem is not yet loaded but params exist
     activeItem = {
-      id: `temp_${s}_${a}`,
-      surah: s,
-      ayah: a
+      id: `temp_${params.surah}_${params.ayah}`,
+      surah: parseInt(params.surah),
+      ayah: parseInt(params.ayah)
     };
-    console.log('[MemorizeFlow] Constructed temp item:', activeItem);
   }
-
-  // Validate item
-  if (!activeItem) {
-    console.error('[MemorizeFlow] Item is null/undefined after normalization');
-    // ...
-  }
-
-  if (!activeItem) {
-    // Safety fallback
-    return (
-      <View style={[styles.centerContent, { backgroundColor: theme.background }]}>
-        <Text style={{ color: theme.error }}>Error: No ayah selected</Text>
-        <Pressable onPress={() => navigation.goBack()}><Text style={{ color: theme.primary }}>Go Back</Text></Pressable>
-      </View>
-    );
-  }
-
-  // State
-  const [stage, setStage] = useState(STAGE_PREP);
-  const [loading, setLoading] = useState(true);
-  const [audioUri, setAudioUri] = useState(null);
-
-  // Audio
-  const [sound, setSound] = useState();
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  // Recall State
-  const [recallMode, setRecallMode] = useState(RECALL_TYPE_GAP_FILL);
-  const [userInput, setUserInput] = useState('');
-  const [recallAttempts, setRecallAttempts] = useState(0);
-  const [showHint, setShowHint] = useState(false);
-
-  // Data
-  const surah = quranData.surahs.find(s => s.number === activeItem.surah);
-  // LOOKUP FIX: item.ayah is RELATIVE (1..N). Array is 0-indexed.
-  // quranData ayahs have 'number' as GLOBAL ID, so we cannot use .find(number).
-  // We strictly assume ayahs are sorted 1..N in the array.
-  const ayahObj = surah ? surah.ayahs[activeItem.ayah - 1] : null;
-  const ayahText = ayahObj ? ayahObj.text : '';
 
   useEffect(() => {
     // Reset state when a new item is passed
@@ -158,39 +148,25 @@ const MemorizeFlow = ({ route, navigation }) => {
     setRecallAttempts(0);
     setShowHint(false);
 
-    loadAudio();
-    // No cleanup here, we use useFocusEffect
-  }, [activeItem.id]);
+    const loadAudio = async () => {
+      if (!activeItem || !activeItem.surah || !activeItem.ayah) return;
+      try {
+        const uri = await getPlayableUrl(activeItem.surah, activeItem.ayah);
+        setAudioUri(uri);
+        setLoading(false);
+      } catch (e) {
+        console.error('Audio load failed', e);
+        setLoading(false);
+      }
+    };
 
-  useFocusEffect(
-    useCallback(() => {
-      // Cleanup on unfocus
-      return () => {
-        if (sound) {
-          sound.unloadAsync();
-          setIsPlaying(false);
-        }
-      };
-    }, [sound])
-  );
+    if (activeItem) loadAudio();
+  }, [activeItem?.id]);
 
-  const loadAudio = async () => {
-    // Safety check
-    if (!activeItem || !activeItem.surah || !activeItem.ayah) return;
 
-    try {
-      const uri = await getPlayableUrl(activeItem.surah, activeItem.ayah);
-      setAudioUri(uri);
-      setLoading(false);
-    } catch (e) {
-      console.error('Audio load failed', e);
-      setLoading(false);
-    }
-  };
-
+  // --- ACTIONS ---
   const playAudio = async (loop = false) => {
     if (sound) await sound.unloadAsync();
-
     try {
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: audioUri },
@@ -213,12 +189,65 @@ const MemorizeFlow = ({ route, navigation }) => {
     setIsPlaying(false);
   };
 
-  // --- STAGE LOGIC ---
+  const checkFirstWords = () => {
+    const words = normalizeArabicText(ayahText).split(' ');
+    const target = words.slice(0, 3).join(' ');
+    const input = normalizeArabicText(userInput);
+    if (input.includes(target) || recallAttempts >= 2) {
+      setRecallMode(RECALL_TYPE_GAP_FILL);
+      setUserInput('');
+      setRecallAttempts(0);
+    } else {
+      Alert.alert('Try again', 'Type the first 3 words.');
+      setRecallAttempts(p => p + 1);
+    }
+  };
 
+  const handleGrade = async (grade) => {
+    try {
+      await recordAttempt(activeItem.id, grade);
+      setStage(STAGE_DONE);
+      setTimeout(() => {
+        navigation.goBack();
+      }, 1500);
+    } catch (e) {
+      Alert.alert('Error', e.message);
+    }
+  };
+
+  // --- DATA DERIVATION ---
+  if (!activeItem) {
+    // If truly no item, show error (but inside return to respect hooks)
+    return (
+      <View style={[styles.centerContent, { backgroundColor: theme.background }]}>
+        <ActivityIndicator color={theme.primary} />
+        <Text style={{ marginTop: 20, color: theme.textSecondary }}>Loading verse...</Text>
+      </View>
+    );
+  }
+
+  // Safe Data Lookup
+  let surahName = 'Unknown Surah';
+  let ayahText = '';
+
+  try {
+    const sNum = activeItem.surah?.number || activeItem.surah;
+    const surahObj = quranData.surahs.find(s => s.number === sNum);
+    if (surahObj) {
+      surahName = surahObj.englishName;
+      // Fix for 0-indexed array vs 1-indexed ayah
+      const aIndex = (activeItem.ayah?.number || activeItem.ayah) - 1;
+      if (surahObj.ayahs[aIndex]) {
+        ayahText = surahObj.ayahs[aIndex].text;
+      }
+    }
+  } catch (e) { console.warn('Lookup failed', e); }
+
+  // --- RENDERERS ---
   const renderPrep = () => (
     <View style={styles.centerContent}>
       <Text style={[styles.title, { color: theme.text }]}>Memorize</Text>
-      <Text style={[styles.subtitle, { color: theme.primary }]}>{surah.englishName} {activeItem.surah}:{activeItem.ayah}</Text>
+      <Text style={[styles.subtitle, { color: theme.primary }]}>{surahName} {activeItem.surah}:{activeItem.ayah}</Text>
       <View style={styles.spacer} />
       <Pressable style={[styles.btn, { backgroundColor: theme.surface }]} onPress={() => playAudio(false)}>
         <Ionicons name="play" size={32} color={theme.primary} />
@@ -263,29 +292,9 @@ const MemorizeFlow = ({ route, navigation }) => {
     </View>
   );
 
-  const checkFirstWords = () => {
-    // Simple check: first 3 words
-    const words = normalizeArabicText(ayahText).split(' ');
-    const target = words.slice(0, 3).join(' ');
-    const input = normalizeArabicText(userInput);
-
-    // Allow loose matching (contains)
-    if (input.includes(target) || recallAttempts >= 2) {
-      setRecallMode(RECALL_TYPE_GAP_FILL);
-      setUserInput('');
-      setRecallAttempts(0);
-    } else {
-      Alert.alert('Try again', 'Type the first 3 words.');
-      setRecallAttempts(p => p + 1);
-    }
-  };
-
   const renderRecall = () => {
-    // RECALL_TYPE_GAP_FILL logic only
-    // Simple Gap Fill: Show text with blanks
     const words = ayahText.split(' ');
-    const gaps = words.map((w, i) => i % 3 === 0 ? '_____' : w).join(' '); // Hide every 3rd word
-
+    const gaps = words.map((w, i) => i % 3 === 0 ? '_____' : w).join(' ');
     return (
       <View style={styles.centerContent}>
         <Text style={[styles.instruction, { color: theme.textSecondary }]}>Active Recall: Gap Fill</Text>
@@ -302,18 +311,6 @@ const MemorizeFlow = ({ route, navigation }) => {
         )}
       </View>
     );
-  };
-
-  const handleGrade = async (grade) => {
-    try {
-      await recordAttempt(activeItem.id, grade);
-      setStage(STAGE_DONE);
-      setTimeout(() => {
-        navigation.goBack(); // Return to queue
-      }, 1500);
-    } catch (e) {
-      Alert.alert('Error', e.message);
-    }
   };
 
   const renderGrade = () => (
@@ -357,7 +354,11 @@ const MemorizeFlow = ({ route, navigation }) => {
         <Text style={{ color: theme.textSecondary }}> {currentIndex + 1} / {queueLength}</Text>
       </View>
 
-      {loading ? <ActivityIndicator color={theme.primary} /> : (
+      {loading ? (
+        <View style={styles.centerContent}>
+          <ActivityIndicator color={theme.primary} />
+        </View>
+      ) : (
         <>
           {stage === STAGE_PREP && renderPrep()}
           {stage === STAGE_READ && renderRead()}

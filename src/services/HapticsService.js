@@ -43,6 +43,28 @@ export const triggerHaptic = (type = 'light', debounceKey = 'global') => {
 };
 
 export const haptics = {
+  /**
+   * Trigger impact haptic feedback
+   * @param {string} style - 'light', 'medium', or 'heavy'
+   */
+  impact: (style = 'light') => triggerHaptic(style),
+
+  /**
+   * Trigger notification haptic feedback
+   * @param {string} type - 'success', 'warning', or 'error'
+   */
+  notification: (type = 'success') => triggerHaptic(type),
+
+  /**
+   * Trigger selection haptic feedback
+   * Used for UI element selection (toggles, pickers, etc.)
+   */
+  selection: () => {
+    // Use 'medium' for selection feedback (feels more responsive than 'light')
+    return triggerHaptic('medium');
+  },
+
+  // Legacy support if needed, though selection covers it
   light: () => triggerHaptic('light'),
   medium: () => triggerHaptic('medium'),
   success: () => triggerHaptic('success'),

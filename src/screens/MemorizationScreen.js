@@ -54,9 +54,22 @@ const MemorizationScreen = ({ navigation }) => {
     }
   };
 
-  const getSurahName = (num) => {
-    const s = quranData.surahs.find(x => x.number === num);
-    return s ? s.englishName : `Surah ${num}`;
+  /**
+   * Safe Surah Name Getter
+   */
+  const getSurahName = (input) => {
+    try {
+      // Handle if input is object (legacy/corruption)
+      const num = (typeof input === 'object' && input?.number) ? input.number : input;
+
+      // Handle string/number mismatch
+      const id = parseInt(num, 10);
+
+      const s = quranData.surahs.find(x => x.number === id);
+      return s ? s.englishName : `Surah ${id}`;
+    } catch (e) {
+      return 'Surah ?';
+    }
   };
 
   return (
