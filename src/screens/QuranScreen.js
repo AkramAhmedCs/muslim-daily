@@ -142,9 +142,13 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
   const toggleBookmark = async () => {
     if (!selectedSurah) return;
     const ayah = selectedSurah.ayahs[currentAyahIndex];
+
+    triggerHaptic('selection', 'bookmark');
+
     if (currentBookmarkId) {
       await deleteBookmark(currentBookmarkId);
       setCurrentBookmarkId(null);
+      console.log('[Bookmark] Removed, state set to null');
     } else {
       const newId = await addBookmark({
         surah: selectedSurah.number,
@@ -153,6 +157,7 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
         label: `${selectedSurah.englishName} : ${ayah.numberInSurah}`
       });
       setCurrentBookmarkId(newId);
+      console.log('[Bookmark] Added, state set to:', newId);
     }
   };
 

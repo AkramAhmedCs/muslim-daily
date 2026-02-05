@@ -215,12 +215,16 @@ const MemorizeFlow = ({ route, navigation }) => {
     audioOperationInProgress.current = true;
 
     setIsPlaying(false); // Update UI immediately
+
+    // Fully unload and clear sound to prevent stale callbacks
     if (sound) {
       try {
         await sound.stopAsync();
+        await sound.unloadAsync();
       } catch (e) {
-        // Ignore stop errors
+        // Ignore stop/unload errors
       }
+      setSound(null);
     }
 
     audioOperationInProgress.current = false;

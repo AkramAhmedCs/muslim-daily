@@ -39,6 +39,7 @@ export const getBookmarks = async () => {
 export const deleteBookmark = async (id) => {
   try {
     await writeQuery(`DELETE FROM bookmarks WHERE id = ?`, [id]);
+    console.log('[Bookmark] Deleted:', id);
   } catch (error) {
     console.error('[Bookmark] Delete Error:', error);
   }
