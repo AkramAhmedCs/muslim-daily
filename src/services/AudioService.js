@@ -1,5 +1,6 @@
 import { documentDirectory, getInfoAsync, makeDirectoryAsync, downloadAsync } from 'expo-file-system';
 import { readFirstQuery, writeQuery } from './DatabaseService';
+import { getSettings } from './storage';
 import * as Crypto from 'expo-crypto';
 
 const CACHE_DIR = documentDirectory + 'audio_cache/';
@@ -19,15 +20,31 @@ const ensureCacheDir = async () => {
 };
 
 /**
- * Get the playable URL (Local file if exists, otherwise Remote stream)
+ * Get the selected reciter from settings
  */
-export const getPlayableUrl = async (surah, ayah, reciter = DEFAULT_RECITER) => {
+const getSelectedReciter = async () => {
+  try {
+    const settings = await getSettings();
+    return settings.selectedReciter || DEFAULT_RECITER;
+  } catch (e) {
+    return DEFAULT_RECITER;
+  }
+};
+
+/**
+ * Get the playable URL (Local file if exists, otherwise Remote stream)
+ * If no reciter is specified, uses the selected reciter from settings
+ */
+export const getPlayableUrl = async (surah, ayah, reciter = null) => {
   await ensureCacheDir();
+
+  // Auto-fetch selected reciter from settings if not provided
+  const activeReciter = reciter || await getSelectedReciter();
 
   // 1. Check DB/Filesystem for local cache
   const cached = await readFirstQuery(
     `SELECT localPath FROM audio_cache WHERE surah = ? AND ayah = ? AND reciter = ?`,
-    [surah, ayah, reciter]
+    [surah, ayah, activeReciter]
   );
 
   if (cached && cached.localPath) {
@@ -49,7 +66,7 @@ export const getPlayableUrl = async (surah, ayah, reciter = DEFAULT_RECITER) => 
   // 2. Return Remote URL
   const paddedSurah = String(surah).padStart(3, '0');
   const paddedAyah = String(ayah).padStart(3, '0');
-  return `https://everyayah.com/data/${reciter}/${paddedSurah}${paddedAyah}.mp3`;
+  return `https://everyayah.com/data/${activeReciter}/${paddedSurah}${paddedAyah}.mp3`;
 };
 
 /**

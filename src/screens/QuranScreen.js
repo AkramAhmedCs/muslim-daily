@@ -20,7 +20,8 @@ import {
   getTafsirForAyah,
   addItem,
   getJuzProgressForAyah,
-  formatJuzProgress
+  formatJuzProgress,
+  getSettings
 } from '../services';
 import { triggerHaptic } from '../services/HapticsService';
 import { isFeatureEnabled } from '../config/features';
@@ -171,9 +172,13 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
       setIsLoadingAudio(true);
       if (sound) await sound.unloadAsync();
 
+      // Get selected reciter from settings
+      const settings = await getSettings();
+      const reciter = settings.selectedReciter || 'Alafasy_128kbps';
+
       const surahNum = String(selectedSurah.number).padStart(3, '0');
       const ayahNum = String(selectedSurah.ayahs[currentAyahIndex].number).padStart(3, '0');
-      const url = `https://everyayah.com/data/Alafasy_128kbps/${surahNum}${ayahNum}.mp3`;
+      const url = `https://everyayah.com/data/${reciter}/${surahNum}${ayahNum}.mp3`;
 
       const { sound: newSound } = await Audio.Sound.createAsync({ uri: url }, { shouldPlay: true });
       setSound(newSound);
@@ -308,6 +313,9 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
       <View style={[styles.container, { backgroundColor: theme.background }]}>
         <View style={[styles.compactHeader, { paddingTop: insets.top }]}>
           <Text style={[styles.headerSurah, { color: theme.text, fontSize: 24, marginLeft: 16 }]}>Quran Reader</Text>
+          <Pressable onPress={() => navigation.navigate('Bookmarks')} style={styles.iconBtn}>
+            <Ionicons name="bookmarks-outline" size={24} color={theme.text} />
+          </Pressable>
         </View>
         <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
           {surahs.map(s => (

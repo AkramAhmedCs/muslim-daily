@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Switch, ScrollView, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, Switch, ScrollView, Pressable, Alert, Modal, FlatList, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../theme';
@@ -7,6 +7,7 @@ import { useLanguage } from '../context';
 import { Card } from '../components';
 import { getSettings, updateSettings, resetAllData } from '../services';
 import { sendTestNotification, scheduleAllReminders } from './../../src/services/notifications';
+import { RECITERS, DEFAULT_RECITER, getReciterById } from '../constants/reciters';
 
 const SettingsScreen = () => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
@@ -14,12 +15,24 @@ const SettingsScreen = () => {
   const insets = useSafeAreaInsets();
   const [settings, setSettings] = useState({});
   const [testingNotification, setTestingNotification] = useState(false);
+  const [showReciterPicker, setShowReciterPicker] = useState(false);
+  const [selectedReciter, setSelectedReciter] = useState(DEFAULT_RECITER);
 
   useEffect(() => { loadSettings(); }, []);
 
   const loadSettings = async () => {
     const data = await getSettings();
     setSettings(data);
+    // Load selected reciter from settings
+    if (data.selectedReciter) {
+      setSelectedReciter(data.selectedReciter);
+    }
+  };
+
+  const handleReciterChange = async (reciterId) => {
+    setSelectedReciter(reciterId);
+    await updateSettings({ selectedReciter: reciterId });
+    setShowReciterPicker(false);
   };
 
   const handleToggle = async (key) => {
@@ -131,6 +144,26 @@ const SettingsScreen = () => {
         <SettingRow icon="moon-outline" title={t('darkMode')} value={isDarkMode} onToggle={toggleTheme} />
       </Card>
 
+      {/* Quran Audio Section */}
+      <Card style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Quran Audio</Text>
+        <Pressable
+          style={[styles.settingRow, { borderBottomColor: theme.border }]}
+          onPress={() => setShowReciterPicker(true)}
+        >
+          <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+            <Ionicons name="mic-outline" size={20} color={theme.primary} />
+          </View>
+          <View style={styles.settingText}>
+            <Text style={[styles.settingTitle, { color: theme.text }]}>Reciter</Text>
+            <Text style={[styles.settingSubtitle, { color: theme.textSecondary }]}>
+              {getReciterById(selectedReciter).name}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={theme.textSecondary} />
+        </Pressable>
+      </Card>
+
       <Card style={styles.section}>
         <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Reminders</Text>
         <SettingRow icon="sunny-outline" title="Morning Adhkar" subtitle="After Fajr" value={settings.morningReminderEnabled} onToggle={() => handleToggle('morningReminderEnabled')} />
@@ -176,6 +209,50 @@ const SettingsScreen = () => {
           Sources: Hisn al-Muslim, Sahih al-Bukhari, Sahih Muslim, Riyad as-Salihin, Tanzil.net (Quran)
         </Text>
       </View>
+
+      {/* Reciter Picker Modal */}
+      <Modal
+        visible={showReciterPicker}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowReciterPicker(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowReciterPicker(false)}
+        >
+          <View style={[styles.modalContent, { backgroundColor: theme.surface }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: theme.text }]}>Select Reciter</Text>
+              <TouchableOpacity onPress={() => setShowReciterPicker(false)}>
+                <Ionicons name="close" size={24} color={theme.text} />
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={RECITERS}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.reciterItem,
+                    { borderBottomColor: theme.border },
+                    selectedReciter === item.id && { backgroundColor: theme.primary + '15' }
+                  ]}
+                  onPress={() => handleReciterChange(item.id)}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.reciterName, { color: theme.text }]}>{item.name}</Text>
+                    <Text style={[styles.reciterNameAr, { color: theme.textSecondary }]}>{item.nameAr}</Text>
+                  </View>
+                  {selectedReciter === item.id && (
+                    <Ionicons name="checkmark-circle" size={24} color={theme.primary} />
+                  )}
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </Pressable>
+      </Modal>
     </ScrollView>
   );
 };
@@ -231,6 +308,44 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 16,
     paddingBottom: 16,
+  },
+  // Modal styles for reciter picker
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '70%',
+    paddingBottom: 30,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  reciterItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  reciterName: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  reciterNameAr: {
+    fontSize: 14,
+    marginTop: 2,
   },
 });
 
