@@ -95,6 +95,7 @@ const GoalsScreen = ({ navigation }) => {
           onPress={() => {
             try { haptics.selection?.(); } catch (e) { }
             setNewPlanType('pages_per_day');
+            setTargetValue('20'); // Reset to default pages
           }}
         >
           <Text style={[styles.typeText, newPlanType === 'pages_per_day' ? { color: 'white' } : { color: theme.text }]}>
@@ -106,6 +107,7 @@ const GoalsScreen = ({ navigation }) => {
           onPress={() => {
             try { haptics.selection?.(); } catch (e) { }
             setNewPlanType('finish_by_date');
+            setTargetValue(new Date().toISOString().split('T')[0]); // Reset to today's date
           }}
         >
           <Text style={[styles.typeText, newPlanType === 'finish_by_date' ? { color: 'white' } : { color: theme.text }]}>

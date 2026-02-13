@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { View, Text, StyleSheet, Modal, Pressable, BackHandler, ActivityIndicator, PanResponder, I18nManager, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Modal, Pressable, BackHandler, ActivityIndicator, PanResponder, I18nManager, ScrollView, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
@@ -62,6 +62,10 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const [showAudioSheet, setShowAudioSheet] = useState(false);
+
+  // Search State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
 
   const surahs = quranData.surahs || [];
   const translations = translationsData.translations || {};
@@ -308,28 +312,92 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
     );
   };
 
+  // Helper function to normalize Arabic text (remove diacritics/harakat)
+  const normalizeArabic = (text) => {
+    if (!text) return '';
+    // Remove Arabic diacritics (tashkeel): fatha, damma, kasra, sukun, shadda, tanwin, etc.
+    return text
+      .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g, '') // Remove diacritics
+      .replace(/[ٱ]/g, 'ا') // Replace alef wasla with regular alef
+      .replace(/سورة\s*/g, '') // Remove "سورة" prefix
+      .trim();
+  };
+
   if (!selectedSurah) {
+    // Filter surahs based on search query (English name, translation, or Arabic name)
+    const filteredSurahs = searchQuery.trim() === ''
+      ? surahs
+      : surahs.filter(s => {
+        const query = searchQuery.toLowerCase().trim().replace(/-/g, ''); // Remove dashes
+        const normalizedQuery = normalizeArabic(searchQuery.trim());
+        const normalizedName = normalizeArabic(s.name);
+        const englishName = s.englishName.toLowerCase().replace(/-/g, '');
+        const englishTranslation = s.englishNameTranslation.toLowerCase().replace(/-/g, '');
+
+        return (
+          englishName.includes(query) ||
+          englishTranslation.includes(query) ||
+          normalizedName.includes(normalizedQuery) // Arabic name with normalization
+        );
+      });
+
     return (
       <View style={[styles.container, { backgroundColor: theme.background }]}>
         <View style={[styles.compactHeader, { paddingTop: insets.top }]}>
-          <Text style={[styles.headerSurah, { color: theme.text, fontSize: 24, marginLeft: 16 }]}>Quran Reader</Text>
-          <Pressable onPress={() => navigation.navigate('Bookmarks')} style={styles.iconBtn}>
-            <Ionicons name="bookmarks-outline" size={24} color={theme.text} />
-          </Pressable>
+          {!showSearch ? (
+            <>
+              <Text style={[styles.headerSurah, { color: theme.text, fontSize: 24, marginLeft: 16 }]}>Quran Reader</Text>
+              <View style={styles.headerActions}>
+                <Pressable onPress={() => setShowSearch(true)} style={styles.iconBtn}>
+                  <Ionicons name="search-outline" size={24} color={theme.text} />
+                </Pressable>
+                <Pressable onPress={() => navigation.navigate('Bookmarks')} style={styles.iconBtn}>
+                  <Ionicons name="bookmarks-outline" size={24} color={theme.text} />
+                </Pressable>
+              </View>
+            </>
+          ) : (
+            <View style={styles.searchContainer}>
+              <Ionicons name="search" size={20} color={theme.textSecondary} style={{ marginRight: 8 }} />
+              <TextInput
+                style={[styles.searchInput, { color: theme.text }]}
+                placeholder="Search Surah..."
+                placeholderTextColor={theme.textSecondary}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoFocus
+              />
+              <Pressable
+                onPress={() => { setShowSearch(false); setSearchQuery(''); }}
+                style={styles.iconBtn}
+              >
+                <Ionicons name="close" size={24} color={theme.text} />
+              </Pressable>
+            </View>
+          )}
         </View>
         <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-          {surahs.map(s => (
-            <Pressable key={s.number} onPress={() => handleSurahSelect(s)} style={[styles.surahItem, { borderBottomColor: theme.border }]}>
-              <View style={[styles.surahBadge, { backgroundColor: theme.primary + '20' }]}>
-                <Text style={{ color: theme.primary, fontWeight: 'bold' }}>{s.number}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ color: theme.text, fontWeight: 'bold' }}>{s.englishName}</Text>
-                <Text style={{ color: theme.textSecondary, fontSize: 12 }}>{s.englishNameTranslation}</Text>
-              </View>
-              <Text style={{ color: theme.text, fontFamily: 'System', fontSize: 18 }}>{s.name}</Text>
-            </Pressable>
-          ))}
+          {filteredSurahs.length === 0 ? (
+            <View style={{ padding: 40, alignItems: 'center' }}>
+              <Ionicons name="search" size={48} color={theme.textSecondary} />
+              <Text style={{ color: theme.textSecondary, marginTop: 12, fontSize: 16 }}>
+                No Surah found for "{searchQuery}"
+              </Text>
+            </View>
+          ) : (
+            filteredSurahs.map(s => (
+              <Pressable key={s.number} onPress={() => handleSurahSelect(s)} style={[styles.surahItem, { borderBottomColor: theme.border }]}>
+                <View style={[styles.surahBadge, { backgroundColor: theme.primary + '20' }]}>
+                  <Text style={{ color: theme.primary, fontWeight: 'bold' }}>{s.number}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: theme.text, fontWeight: 'bold' }}>{s.englishName}</Text>
+                  <Text style={{ color: theme.textSecondary, fontSize: 12 }}>{s.englishNameTranslation}</Text>
+                </View>
+                <Text style={{ color: theme.text, fontFamily: 'System', fontSize: 18 }}>{s.name}</Text>
+              </Pressable>
+            ))
+          )}
         </ScrollView>
       </View>
     );
@@ -477,7 +545,20 @@ const styles = StyleSheet.create({
   toastText: {
     fontWeight: '600',
     fontSize: 14
-  }
+  },
+  // Search styles
+  searchContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 16,
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 8,
+  },
 });
 
 export default QuranScreen;

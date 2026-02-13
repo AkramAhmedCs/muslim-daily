@@ -22,7 +22,7 @@ const HomeScreen = ({ navigation }) => {
   const { greeting } = useGreeting();
   const insets = useSafeAreaInsets();
   const [checklist, setChecklist] = useState({});
-  const [streak, setStreak] = useState({ current: 0, best: 0 });
+  const [streak, setStreak] = useState({ current: 0, best: 0, isFrozen: false });
   const [refreshing, setRefreshing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -173,10 +173,16 @@ const HomeScreen = ({ navigation }) => {
           {/* Streak Card */}
           <Card style={[styles.streakCard, { width: '40%' }]}>
             <View style={styles.streakHeader}>
-              <Ionicons name="flame" size={24} color="#FF6D00" />
+              <Ionicons
+                name={streak.isFrozen ? "snow" : "flame"}
+                size={24}
+                color={streak.isFrozen ? "#00B4D8" : "#FF6D00"}
+              />
               <Text style={[styles.streakCount, { color: theme.text }]}>{streak.current}</Text>
             </View>
-            <Text style={[styles.streakLabel, { color: theme.textSecondary }]}>Day Streak</Text>
+            <Text style={[styles.streakLabel, { color: theme.textSecondary }]}>
+              {streak.isFrozen ? 'Frozen' : 'Day Streak'}
+            </Text>
             <Text style={[styles.bestStreak, { color: theme.textSecondary }]}>Best: {streak.best}</Text>
           </Card>
         </View>

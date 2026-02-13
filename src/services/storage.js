@@ -6,6 +6,7 @@ const STORAGE_KEYS = {
   ADHKAR_PROGRESS: '@muslim_daily_adhkar_progress',
   LAST_RESET_DATE: '@muslim_daily_last_reset',
   STREAK: '@muslim_daily_streak',
+  STREAK_FREEZE: '@muslim_daily_streak_freeze',
   QURAN_STATS: '@muslim_daily_quran_stats',
   DATA_VERSION: '@muslim_daily_data_version',
 };
@@ -235,13 +236,118 @@ export const resetAdhkarProgress = async (adhkarId) => {
 };
 
 // Streak Operations
+
+// Helper to get current month key (YYYY-MM)
+const getCurrentMonthKey = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+};
+
+// Get streak freeze data with monthly reset
+export const getStreakFreeze = async () => {
+  try {
+    const data = await AsyncStorage.getItem(STORAGE_KEYS.STREAK_FREEZE);
+    const currentMonth = getCurrentMonthKey();
+    const defaults = {
+      freezesUsedThisMonth: 0,
+      monthKey: currentMonth,
+      lastFreezeDate: null,
+      isFrozenToday: false
+    };
+
+    if (!data) return defaults;
+
+    const freezeData = JSON.parse(data);
+
+    // Reset counter on new month
+    if (freezeData.monthKey !== currentMonth) {
+      freezeData.freezesUsedThisMonth = 0;
+      freezeData.monthKey = currentMonth;
+      freezeData.lastFreezeDate = null;
+      freezeData.isFrozenToday = false;
+      await AsyncStorage.setItem(STORAGE_KEYS.STREAK_FREEZE, JSON.stringify(freezeData));
+    }
+
+    // Reset isFrozenToday if it's a new day
+    const today = getTodayString();
+    if (freezeData.lastFreezeDate !== today) {
+      freezeData.isFrozenToday = false;
+    }
+
+    return freezeData;
+  } catch (error) {
+    console.error('Error getting streak freeze:', error);
+    return { freezesUsedThisMonth: 0, monthKey: getCurrentMonthKey(), lastFreezeDate: null, isFrozenToday: false };
+  }
+};
+
+// Use a streak freeze (returns true if successful, false if not allowed)
+export const useStreakFreeze = async () => {
+  try {
+    const freezeData = await getStreakFreeze();
+    const today = getTodayString();
+
+    // Check if already frozen today
+    if (freezeData.isFrozenToday) {
+      return { success: false, reason: 'already_frozen_today' };
+    }
+
+    // Check max 4 freezes per month
+    if (freezeData.freezesUsedThisMonth >= 4) {
+      return { success: false, reason: 'max_freezes_reached' };
+    }
+
+    // Check no consecutive days (can't freeze if yesterday was also frozen)
+    if (freezeData.lastFreezeDate) {
+      const lastFreeze = new Date(freezeData.lastFreezeDate);
+      const todayDate = new Date(today);
+      lastFreeze.setHours(0, 0, 0, 0);
+      todayDate.setHours(0, 0, 0, 0);
+
+      const diffTime = todayDate - lastFreeze;
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        return { success: false, reason: 'consecutive_freeze_not_allowed' };
+      }
+    }
+
+    // Apply freeze
+    freezeData.freezesUsedThisMonth += 1;
+    freezeData.lastFreezeDate = today;
+    freezeData.isFrozenToday = true;
+
+    await AsyncStorage.setItem(STORAGE_KEYS.STREAK_FREEZE, JSON.stringify(freezeData));
+    return { success: true, freezesRemaining: 4 - freezeData.freezesUsedThisMonth };
+  } catch (error) {
+    console.error('Error using streak freeze:', error);
+    return { success: false, reason: 'error' };
+  }
+};
+
+// Set manual streak value (for beta testers who lost progress)
+export const setManualStreak = async (count) => {
+  try {
+    const streak = await getStreak();
+    streak.current = Math.max(0, parseInt(count) || 0);
+    streak.best = Math.max(streak.current, streak.best);
+    streak.lastCompletionDate = getTodayString();
+    await AsyncStorage.setItem(STORAGE_KEYS.STREAK, JSON.stringify(streak));
+    return streak;
+  } catch (error) {
+    console.error('Error setting manual streak:', error);
+    return null;
+  }
+};
+
 export const getStreak = async () => {
   try {
     const data = await AsyncStorage.getItem(STORAGE_KEYS.STREAK);
-    const defaults = { current: 0, best: 0, lastCompletionDate: null };
+    const defaults = { current: 0, best: 0, lastCompletionDate: null, isFrozen: false };
     if (!data) return defaults;
 
     const streak = JSON.parse(data);
+    streak.isFrozen = false; // Reset frozen status
 
     // Validate streak continuity
     if (streak.lastCompletionDate) {
@@ -254,19 +360,37 @@ export const getStreak = async () => {
       const diffTime = Math.abs(today - last);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-      // If completed today, streak is valid (and unchanged)
-      // If completed yesterday (diffDays = 1), streak is valid
-      // If completed > 1 day ago, streak starts over (but best is kept)
+      // If completed today or yesterday, streak is valid
+      // If completed > 1 day ago, try to use a freeze
       if (diffDays > 1) {
-        streak.current = 0;
-        await AsyncStorage.setItem(STORAGE_KEYS.STREAK, JSON.stringify(streak));
+        // Try to use a streak freeze
+        const freezeResult = await useStreakFreeze();
+
+        if (freezeResult.success) {
+          // Streak is preserved! Update lastCompletionDate to yesterday to maintain continuity
+          const yesterday = new Date(today);
+          yesterday.setDate(yesterday.getDate() - 1);
+          streak.lastCompletionDate = yesterday.toISOString().split('T')[0];
+          streak.isFrozen = true;
+          await AsyncStorage.setItem(STORAGE_KEYS.STREAK, JSON.stringify(streak));
+        } else {
+          // Freeze failed - reset streak
+          streak.current = 0;
+          streak.isFrozen = false;
+          await AsyncStorage.setItem(STORAGE_KEYS.STREAK, JSON.stringify(streak));
+        }
       }
     }
+
+    // Check if currently frozen for UI display
+    const freezeData = await getStreakFreeze();
+    streak.isFrozen = freezeData.isFrozenToday;
+    streak.freezesRemaining = 4 - freezeData.freezesUsedThisMonth;
 
     return streak;
   } catch (error) {
     console.error('Error getting streak:', error);
-    return { current: 0, best: 0, lastCompletionDate: null };
+    return { current: 0, best: 0, lastCompletionDate: null, isFrozen: false, freezesRemaining: 4 };
   }
 };
 
@@ -286,6 +410,7 @@ export const checkAndUpdateStreak = async (checklist) => {
     streak.current += 1;
     streak.best = Math.max(streak.current, streak.best);
     streak.lastCompletionDate = today;
+    streak.isFrozen = false; // Clear frozen state when day is completed
 
     await AsyncStorage.setItem(STORAGE_KEYS.STREAK, JSON.stringify(streak));
   } catch (error) {

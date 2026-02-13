@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Switch, ScrollView, Pressable, Alert, Modal, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Switch, ScrollView, Pressable, Alert, Modal, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../theme';
 import { useLanguage } from '../context';
 import { Card } from '../components';
-import { getSettings, updateSettings, resetAllData } from '../services';
+import { getSettings, updateSettings, resetAllData, setManualStreak } from '../services';
 import { sendTestNotification, scheduleAllReminders } from './../../src/services/notifications';
 import { RECITERS, DEFAULT_RECITER, getReciterById } from '../constants/reciters';
 
@@ -17,6 +17,8 @@ const SettingsScreen = () => {
   const [testingNotification, setTestingNotification] = useState(false);
   const [showReciterPicker, setShowReciterPicker] = useState(false);
   const [selectedReciter, setSelectedReciter] = useState(DEFAULT_RECITER);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  const [streakInput, setStreakInput] = useState('');
 
   useEffect(() => { loadSettings(); }, []);
 
@@ -80,6 +82,23 @@ const SettingsScreen = () => {
         }
       ]
     );
+  };
+
+  const handleSetStreak = async () => {
+    const count = parseInt(streakInput);
+    if (isNaN(count) || count < 0) {
+      Alert.alert('Invalid Input', 'Please enter a valid number (0 or greater).');
+      return;
+    }
+
+    const result = await setManualStreak(count);
+    if (result) {
+      Alert.alert('Success', `Your streak has been set to ${count} days.`);
+      setShowStreakModal(false);
+      setStreakInput('');
+    } else {
+      Alert.alert('Error', 'Failed to set streak. Please try again.');
+    }
   };
 
   const SettingRow = ({ icon, title, subtitle, value, onToggle }) => (
@@ -202,6 +221,23 @@ const SettingsScreen = () => {
 
       </Card>
 
+      {/* Beta Recovery Section */}
+      <Card style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Beta Recovery</Text>
+        <Text style={[styles.resetHint, { color: theme.textSecondary, marginBottom: 8 }]}>
+          For beta testers who lost streak data while switching versions
+        </Text>
+        <Pressable
+          style={[styles.testButton, { backgroundColor: theme.primary + '15' }]}
+          onPress={() => setShowStreakModal(true)}
+        >
+          <Ionicons name="refresh-outline" size={20} color={theme.primary} />
+          <Text style={[styles.testButtonText, { color: theme.primary }]}>
+            Set Streak Manually
+          </Text>
+        </Pressable>
+      </Card>
+
       <View style={styles.about}>
         <Text style={[styles.appName, { color: theme.text }]}>Muslim Daily</Text>
         <Text style={[styles.version, { color: theme.textSecondary }]}>Version 1.0.0</Text>
@@ -251,6 +287,57 @@ const SettingsScreen = () => {
               )}
             />
           </View>
+        </Pressable>
+      </Modal>
+
+      {/* Streak Setting Modal */}
+      <Modal
+        visible={showStreakModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowStreakModal(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowStreakModal(false)}
+        >
+          <Pressable style={[styles.streakModalContent, { backgroundColor: theme.surface }]} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: theme.text }]}>Set Streak</Text>
+              <TouchableOpacity onPress={() => setShowStreakModal(false)}>
+                <Ionicons name="close" size={24} color={theme.text} />
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.resetHint, { color: theme.textSecondary, marginBottom: 16 }]}>
+              Enter your previous streak count to restore it.
+            </Text>
+            <TextInput
+              style={[styles.streakInput, {
+                borderColor: theme.border,
+                color: theme.text,
+                backgroundColor: theme.background
+              }]}
+              placeholder="Enter streak count (e.g., 7)"
+              placeholderTextColor={theme.textSecondary}
+              keyboardType="number-pad"
+              value={streakInput}
+              onChangeText={setStreakInput}
+            />
+            <View style={styles.modalButtons}>
+              <Pressable
+                style={[styles.modalButton, { backgroundColor: theme.border }]}
+                onPress={() => { setShowStreakModal(false); setStreakInput(''); }}
+              >
+                <Text style={{ color: theme.text }}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modalButton, { backgroundColor: theme.primary }]}
+                onPress={handleSetStreak}
+              >
+                <Text style={{ color: '#FFF', fontWeight: '600' }}>Set Streak</Text>
+              </Pressable>
+            </View>
+          </Pressable>
         </Pressable>
       </Modal>
     </ScrollView>
@@ -346,6 +433,31 @@ const styles = StyleSheet.create({
   reciterNameAr: {
     fontSize: 14,
     marginTop: 2,
+  },
+  // Streak modal styles
+  streakModalContent: {
+    width: '85%',
+    alignSelf: 'center',
+    borderRadius: 20,
+    padding: 20,
+  },
+  streakInput: {
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 14,
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 10,
   },
 });
 
