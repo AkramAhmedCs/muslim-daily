@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
   challengeTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#FFD700',
+    color: '#B09650', // Soft gold — less harsh than #FFD700
   },
   challengeSubtitle: {
     fontSize: 12,
@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
   },
   challengeProgressFill: {
     height: '100%',
-    backgroundColor: '#FFD700',
+    backgroundColor: '#B09650',
     borderRadius: 4,
   },
   challengeStatsRow: {

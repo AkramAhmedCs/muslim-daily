@@ -8,9 +8,9 @@ export const RECITERS = [
   { id: 'Alafasy_128kbps', name: 'Mishary Al-Afasy', nameAr: 'مشاري العفاسي' },
   { id: 'Yasser_Ad-Dussary_128kbps', name: 'Yasser Al-Dossary', nameAr: 'ياسر الدوسري' },
   { id: 'Husary_128kbps', name: 'Mahmoud Khalil Al-Husary', nameAr: 'محمود خليل الحصري' },
-  { id: 'Abdurrahman_as-Sudais_192kbps', name: 'Abdurrahman As-Sudais', nameAr: 'عبدالرحمن السديس' },
+  { id: 'Abdurrahmaan_As-Sudais_192kbps', name: 'Abdurrahman As-Sudais', nameAr: 'عبدالرحمن السديس' },
   { id: 'Abdul_Basit_Mujawwad_128kbps', name: 'Abdul Basit (Mujawwad)', nameAr: 'عبدالباسط عبدالصمد' },
-  { id: 'Maher_AlMuaiqly_128kbps', name: 'Maher Al-Muaiqly', nameAr: 'ماهر المعيقلي' },
+  { id: 'MaherAlMuaiqly128kbps', name: 'Maher Al-Muaiqly', nameAr: 'ماهر المعيقلي' },
   { id: 'Saood_ash-Shuraym_128kbps', name: 'Saud Al-Shuraim', nameAr: 'سعود الشريم' },
 ];
 

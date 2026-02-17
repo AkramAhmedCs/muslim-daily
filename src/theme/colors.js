@@ -33,19 +33,19 @@ export const darkTheme = {
   shadow: 'rgba(0,0,0,0.3)',
 };
 
-// Ramadan Theme — Gold + Midnight Blue (dark-only)
+// Ramadan Theme — Soft gold on deep navy (dark-only, eye-friendly for long reading)
 export const ramadanDarkTheme = {
-  background: '#0D0D1A',
-  surface: '#161625',
-  primary: '#C9A84C',       // Warm gold
-  primaryLight: '#E8C97A',
-  text: '#F5ECD7',          // Warm off-white
-  textSecondary: 'rgba(245,236,215,0.6)',
-  arabicText: '#F5ECD7',
-  accent: '#E8C97A',
-  border: 'rgba(201,168,76,0.2)',
-  success: '#C9A84C',
-  warning: '#E8C97A',
-  card: '#1E1E35',
-  shadow: 'rgba(0,0,0,0.4)',
+  background: '#141420',     // Slightly lifted navy — less harsh than pure black
+  surface: '#1C1C2E',       // Soft navy surface
+  primary: '#B09650',       // Muted, warm gold — easy on the eyes
+  primaryLight: '#C4AA6A',  // Gentle light gold
+  text: '#E0DCD0',          // Soft warm gray — not bright white, not too yellow
+  textSecondary: 'rgba(224,220,208,0.55)', // Subdued secondary text
+  arabicText: '#E8E4D8',    // Slightly brighter for Arabic legibility
+  accent: '#C4AA6A',        // Soft gold accent
+  border: 'rgba(176,150,80,0.15)',  // Very subtle gold-tinted border
+  success: '#B09650',
+  warning: '#C4AA6A',
+  card: '#1A1A2C',          // Barely different from surface for soft layering
+  shadow: 'rgba(0,0,0,0.3)',
 };
