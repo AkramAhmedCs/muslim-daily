@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../theme';
+import { useLanguage } from '../context';
 import {
   HomeScreen,
   AdhkarScreen,
@@ -23,6 +24,8 @@ import {
   MemorizationScreen,
   ReviewSessionScreen,
   MemorizeFlow,
+  RamadanChallengeScreen,
+  QiblaScreen,
 } from '../screens';
 
 const Tab = createBottomTabNavigator();
@@ -30,6 +33,18 @@ const Tab = createBottomTabNavigator();
 // Custom tab bar adapter
 const CustomTabBar = ({ state, descriptors, navigation, theme }) => {
   const insets = useSafeAreaInsets();
+  const { t } = useLanguage();
+
+  // Translated tab labels
+  const tabLabels = {
+    Home: t('home'),
+    Adhkar: t('adhkar'),
+    Hadith: t('hadith'),
+    Dua: t('dua'),
+    PrayerTimes: t('prayer'),
+    Quran: t('quran'),
+    Settings: t('settings'),
+  };
 
   return (
     <View style={[
@@ -86,7 +101,7 @@ const CustomTabBar = ({ state, descriptors, navigation, theme }) => {
               color={isFocused ? theme.primary : theme.textSecondary}
             />
             <Text style={[styles.tabLabel, { color: isFocused ? theme.primary : theme.textSecondary }]}>
-              {route.name}
+              {tabLabels[route.name] || route.name}
             </Text>
           </Pressable>
         );
@@ -230,6 +245,28 @@ const AppNavigator = () => {
           name="Bookmarks"
           component={BookmarksScreen}
           options={{
+            tabBarButton: () => null,
+            tabBarStyle: { display: 'none' }
+          }}
+        />
+
+        {/* Ramadan Challenge */}
+        <Tab.Screen
+          name="RamadanChallenge"
+          component={RamadanChallengeScreen}
+          options={{
+            headerShown: false,
+            tabBarButton: () => null,
+            tabBarStyle: { display: 'none' }
+          }}
+        />
+
+        {/* Qibla Finder */}
+        <Tab.Screen
+          name="Qibla"
+          component={QiblaScreen}
+          options={{
+            headerShown: false,
             tabBarButton: () => null,
             tabBarStyle: { display: 'none' }
           }}

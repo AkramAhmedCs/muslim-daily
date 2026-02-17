@@ -15,3 +15,5 @@ export { default as MemorizeFlow } from './MemorizeFlow';
 export { default as SearchScreen } from './SearchScreen';
 export { default as GoalsScreen } from './GoalsScreen';
 export { default as ScholarReviewScreen } from './ScholarReviewScreen';
+export { default as RamadanChallengeScreen } from './RamadanChallengeScreen';
+export { default as QiblaScreen } from './QiblaScreen';

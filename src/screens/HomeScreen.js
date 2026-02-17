@@ -12,19 +12,25 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../theme';
+import { useLanguage } from '../context';
 import { useGreeting } from '../hooks/useGreeting';
 import { Card, ChecklistItem } from '../components';
 import { getChecklist, updateChecklist, getStreak, haptics } from '../services'; // Added haptics
+import { getChallengeHomeStats } from '../services/RamadanChallengeService';
 import adhkarData from '../../data/adhkar.json';
 
 const HomeScreen = ({ navigation }) => {
   const { theme, isDarkMode } = useTheme();
+  const { t } = useLanguage();
   const { greeting } = useGreeting();
   const insets = useSafeAreaInsets();
   const [checklist, setChecklist] = useState({});
   const [streak, setStreak] = useState({ current: 0, best: 0, isFrozen: false });
   const [refreshing, setRefreshing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [challengeStats, setChallengeStats] = useState({
+    juzsCompleted: 0, totalJuzs: 30, percentage: 0, isActive: false,
+  });
 
   // Determine if it's morning or evening (for content filtering)
   const hour = currentTime.getHours();
@@ -38,8 +44,10 @@ const HomeScreen = ({ navigation }) => {
   const loadData = async () => {
     const checklistData = await getChecklist();
     const streakData = await getStreak();
+    const stats = await getChallengeHomeStats();
     setChecklist(checklistData);
     setStreak(streakData);
+    setChallengeStats(stats);
   };
 
   useFocusEffect(
@@ -215,9 +223,44 @@ const HomeScreen = ({ navigation }) => {
           </Card>
         )}
 
+        {/* Ramadan Challenge Widget */}
+        <Pressable
+          style={[styles.challengeCard, { backgroundColor: theme.surface }]}
+          onPress={() => navigation.navigate('RamadanChallenge')}
+        >
+          <View style={styles.challengeHeader}>
+            <Text style={styles.challengeIcon}>🌙</Text>
+            <View style={styles.challengeTitleGroup}>
+              <Text style={styles.challengeTitle}>{t('ramadanChallenge')}</Text>
+              <Text style={[styles.challengeSubtitle, { color: theme.textSecondary }]}>
+                {challengeStats.isActive
+                  ? `${challengeStats.juzsCompleted} / 30 ${t('juzsCompleted')}`
+                  : t('completeQuranIn30Days')}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={theme.textSecondary} />
+          </View>
+          <View style={[styles.challengeProgressTrack, { backgroundColor: theme.border }]}>
+            <View
+              style={[
+                styles.challengeProgressFill,
+                { width: `${Math.min(challengeStats.percentage, 100)}%` }
+              ]}
+            />
+          </View>
+          <View style={styles.challengeStatsRow}>
+            <Text style={[styles.challengeStatItem, { color: theme.textSecondary }]}>
+              ✅ {challengeStats.juzsCompleted} {t('juzsDone')}
+            </Text>
+            <Text style={[styles.challengeStatItem, { color: theme.textSecondary }]}>
+              📖 {30 - challengeStats.juzsCompleted} {t('remaining')}
+            </Text>
+          </View>
+        </Pressable>
+
         {/* Quick Actions */}
         <Text style={[styles.sectionTitle, { color: theme.text }]}>
-          Quick Access
+          {t('quickAccess')}
         </Text>
         <View style={styles.quickActions} collapsable={false} renderToHardwareTextureAndroid={false}>
           <Pressable
@@ -234,7 +277,7 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('Adhkar')}
           >
             <Ionicons name="book-outline" size={28} color={theme.primary} />
-            <Text style={[styles.quickActionText, { color: theme.text }]}>Adhkar</Text>
+            <Text style={[styles.quickActionText, { color: theme.text }]}>{t('adhkar')}</Text>
           </Pressable>
           <Pressable
             style={({ pressed }) => [
@@ -250,7 +293,7 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('Hadith')}
           >
             <Ionicons name="library-outline" size={28} color={theme.primary} />
-            <Text style={[styles.quickActionText, { color: theme.text }]}>Hadith</Text>
+            <Text style={[styles.quickActionText, { color: theme.text }]}>{t('hadith')}</Text>
           </Pressable>
           <Pressable
             style={({ pressed }) => [
@@ -266,7 +309,7 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('Dua')}
           >
             <Ionicons name="hand-left-outline" size={28} color={theme.primary} />
-            <Text style={[styles.quickActionText, { color: theme.text }]}>Du'a</Text>
+            <Text style={[styles.quickActionText, { color: theme.text }]}>{t('dua')}</Text>
           </Pressable>
           <Pressable
             style={({ pressed }) => [
@@ -282,7 +325,7 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('Quran')}
           >
             <Ionicons name="reader-outline" size={28} color={theme.primary} />
-            <Text style={[styles.quickActionText, { color: theme.text }]}>Quran</Text>
+            <Text style={[styles.quickActionText, { color: theme.text }]}>{t('quran')}</Text>
           </Pressable>
           <Pressable
             style={({ pressed }) => [
@@ -298,7 +341,7 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('Memorization')}
           >
             <Ionicons name="school-outline" size={28} color={theme.primary} />
-            <Text style={[styles.quickActionText, { color: theme.text }]}>Hifz</Text>
+            <Text style={[styles.quickActionText, { color: theme.text }]}>{t('hifz')}</Text>
           </Pressable>
           <Pressable
             style={({ pressed }) => [
@@ -314,14 +357,46 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('Goals')}
           >
             <Ionicons name="trophy-outline" size={28} color={theme.primary} />
-            <Text style={[styles.quickActionText, { color: theme.text }]}>Goals</Text>
+            <Text style={[styles.quickActionText, { color: theme.text }]}>{t('goals')}</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.quickAction,
+              {
+                backgroundColor: theme.background === '#FFFFFF' ? '#FFFFFF' : (theme.background || '#FFFFFF'),
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: theme.border || '#E0E0E0',
+                opacity: pressed ? 0.9 : 1
+              }
+            ]}
+            onPress={() => navigation.navigate('Qibla')}
+          >
+            <Ionicons name="compass-outline" size={28} color={theme.primary} />
+            <Text style={[styles.quickActionText, { color: theme.text }]}>{t('qibla')}</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.quickAction,
+              {
+                backgroundColor: theme.background === '#FFFFFF' ? '#FFFFFF' : (theme.background || '#FFFFFF'),
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: theme.border || '#E0E0E0',
+                opacity: pressed ? 0.9 : 1
+              }
+            ]}
+            onPress={() => navigation.navigate('Bookmarks')}
+          >
+            <Ionicons name="bookmark-outline" size={28} color={theme.primary} />
+            <Text style={[styles.quickActionText, { color: theme.text }]}>{t('bookmarks')}</Text>
           </Pressable>
 
         </View>
 
         {/* Daily Checklist */}
         <Text style={[styles.sectionTitle, { color: theme.text }]}>
-          Daily Checklist
+          {t('dailyChecklist')}
         </Text>
 
         <ChecklistItem
@@ -521,6 +596,53 @@ const styles = StyleSheet.create({
   },
   spacer: {
     height: 40,
+  },
+  // Ramadan Challenge Widget
+  challengeCard: {
+    marginBottom: 20,
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.25)',
+  },
+  challengeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  challengeIcon: {
+    fontSize: 28,
+    marginRight: 12,
+  },
+  challengeTitleGroup: {
+    flex: 1,
+  },
+  challengeTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#FFD700',
+  },
+  challengeSubtitle: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  challengeProgressTrack: {
+    height: 8,
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 10,
+  },
+  challengeProgressFill: {
+    height: '100%',
+    backgroundColor: '#FFD700',
+    borderRadius: 4,
+  },
+  challengeStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  challengeStatItem: {
+    fontSize: 12,
   },
 });
 

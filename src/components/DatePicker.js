@@ -143,7 +143,7 @@ export default function DatePicker({
                 </TouchableOpacity>
                 <Text style={styles.modalTitle}>{label}</Text>
                 <TouchableOpacity onPress={handleConfirm}>
-                  <Text style={styles.confirmButton}>Done</Text>
+                  <Text style={[styles.confirmButton, { color: theme?.primary || '#4CAF50' }]}>Done</Text>
                 </TouchableOpacity>
               </View>
 
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
 
   confirmButton: {
     fontSize: 16,
-    color: '#4CAF50',
+    color: '#4CAF50', // Static fallback — overridden by theme.primary when theme prop is passed
     fontWeight: '600',
   },
 

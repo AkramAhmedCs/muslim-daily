@@ -10,7 +10,7 @@ import { sendTestNotification, scheduleAllReminders } from './../../src/services
 import { RECITERS, DEFAULT_RECITER, getReciterById } from '../constants/reciters';
 
 const SettingsScreen = () => {
-  const { theme, isDarkMode, toggleTheme } = useTheme();
+  const { theme, isDarkMode, toggleTheme, themeStyle, setThemeStyle } = useTheme();
   const { language, toggleLanguage, bilingualMode, toggleBilingualMode, t } = useLanguage();
   const insets = useSafeAreaInsets();
   const [settings, setSettings] = useState({});
@@ -159,13 +159,50 @@ const SettingsScreen = () => {
       </Card>
 
       <Card style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Appearance</Text>
-        <SettingRow icon="moon-outline" title={t('darkMode')} value={isDarkMode} onToggle={toggleTheme} />
+        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>{t('appearance')}</Text>
+
+        {/* Theme Style Selector */}
+        <View style={styles.themeRow}>
+          <Pressable
+            style={[
+              styles.themeButton,
+              { borderColor: theme.border, backgroundColor: theme.background },
+              themeStyle === 'default' && { borderColor: '#4CAF50', backgroundColor: 'rgba(76,175,80,0.1)' },
+            ]}
+            onPress={() => setThemeStyle('default')}
+          >
+            <View style={[styles.themePreviewDot, { backgroundColor: '#4CAF50' }]} />
+            <Text style={[styles.themeLabel, { color: theme.text }]}>Default</Text>
+            {themeStyle === 'default' && <Text style={styles.activeCheck}>✓</Text>}
+          </Pressable>
+          <Pressable
+            style={[
+              styles.themeButton,
+              { borderColor: theme.border, backgroundColor: theme.background },
+              themeStyle === 'ramadan' && { borderColor: '#C9A84C', backgroundColor: 'rgba(201,168,76,0.1)' },
+            ]}
+            onPress={() => setThemeStyle('ramadan')}
+          >
+            <Text style={{ fontSize: 20 }}>🌙</Text>
+            <Text style={[styles.themeLabel, { color: theme.text }]}>Ramadan</Text>
+            {themeStyle === 'ramadan' && <Text style={[styles.activeCheck, { color: '#C9A84C' }]}>✓</Text>}
+          </Pressable>
+        </View>
+
+        {/* Dark mode toggle only for default theme */}
+        {themeStyle === 'default' && (
+          <SettingRow icon="moon-outline" title={t('darkMode')} value={isDarkMode} onToggle={toggleTheme} />
+        )}
+        {themeStyle === 'ramadan' && (
+          <Text style={{ color: theme.textSecondary, fontSize: 12, paddingHorizontal: 16, paddingBottom: 8 }}>
+            Ramadan theme uses dark mode automatically
+          </Text>
+        )}
       </Card>
 
       {/* Quran Audio Section */}
       <Card style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Quran Audio</Text>
+        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>{t('quranAudio')}</Text>
         <Pressable
           style={[styles.settingRow, { borderBottomColor: theme.border }]}
           onPress={() => setShowReciterPicker(true)}
@@ -174,7 +211,7 @@ const SettingsScreen = () => {
             <Ionicons name="mic-outline" size={20} color={theme.primary} />
           </View>
           <View style={styles.settingText}>
-            <Text style={[styles.settingTitle, { color: theme.text }]}>Reciter</Text>
+            <Text style={[styles.settingTitle, { color: theme.text }]}>{t('reciter')}</Text>
             <Text style={[styles.settingSubtitle, { color: theme.textSecondary }]}>
               {getReciterById(selectedReciter).name}
             </Text>
@@ -184,7 +221,7 @@ const SettingsScreen = () => {
       </Card>
 
       <Card style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Reminders</Text>
+        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>{t('reminders')}</Text>
         <SettingRow icon="sunny-outline" title="Morning Adhkar" subtitle="After Fajr" value={settings.morningReminderEnabled} onToggle={() => handleToggle('morningReminderEnabled')} />
         <SettingRow icon="moon-outline" title="Evening Adhkar" subtitle="After Maghrib" value={settings.eveningReminderEnabled} onToggle={() => handleToggle('eveningReminderEnabled')} />
         <SettingRow icon="book-outline" title="Quran Reading" subtitle="Daily Wird reminder" value={settings.quranReminderEnabled} onToggle={() => handleToggle('quranReminderEnabled')} />
@@ -204,7 +241,7 @@ const SettingsScreen = () => {
 
 
       <Card style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Data Management</Text>
+        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>{t('dataManagement')}</Text>
         <Pressable
           style={[styles.resetButton, { backgroundColor: '#FF3B30' + '15' }]}
           onPress={handleResetData}
@@ -223,7 +260,7 @@ const SettingsScreen = () => {
 
       {/* Beta Recovery Section */}
       <Card style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Beta Recovery</Text>
+        <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>{t('betaRecovery')}</Text>
         <Text style={[styles.resetHint, { color: theme.textSecondary, marginBottom: 8 }]}>
           For beta testers who lost streak data while switching versions
         </Text>
@@ -458,6 +495,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 14,
     borderRadius: 10,
+  },
+  // Theme selector styles
+  themeRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    gap: 12,
+  },
+  themeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 2,
+    gap: 8,
+  },
+  themePreviewDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+  },
+  themeLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  activeCheck: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#4CAF50',
   },
 });
 

@@ -159,7 +159,7 @@ const ReviewSessionScreen = ({ navigation }) => {
               <Text style={styles.gradeText}>Good</Text>
               <Text style={styles.gradeSub}>4d</Text>
             </Pressable>
-            <Pressable style={[styles.gradeBtn, { backgroundColor: '#4CAF50' }]} onPress={() => handleGrade('easy')}>
+            <Pressable style={[styles.gradeBtn, { backgroundColor: theme.success || theme.primary }]} onPress={() => handleGrade('easy')}>
               <Text style={styles.gradeText}>Easy</Text>
               <Text style={styles.gradeSub}>7d</Text>
             </Pressable>

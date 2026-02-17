@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Animated, ActivityIndicator } from 'react-native';
 import { useTheme } from '../theme';
 import ArabicText from './ArabicText';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +22,7 @@ const VerseCard = ({
   showTranslation: initialShowTranslation = true,
   onToggleControls,
   isPlaying,
+  isLoadingAudio,
   onPlay,
   isBookmarked,
   onBookmark,
@@ -68,8 +69,12 @@ const VerseCard = ({
           </Text>
           {/* Actions Row */}
           <View style={styles.actionsRow}>
-            <Pressable onPress={onPlay} style={styles.iconBtn}>
-              <Ionicons name={isPlaying ? "pause-circle" : "play-circle-outline"} size={28} color={theme.primary} />
+            <Pressable onPress={onPlay} style={styles.iconBtn} disabled={isLoadingAudio}>
+              {isLoadingAudio ? (
+                <ActivityIndicator size={24} color={theme.primary} />
+              ) : (
+                <Ionicons name={isPlaying ? "pause-circle" : "play-circle-outline"} size={28} color={theme.primary} />
+              )}
             </Pressable>
             <Pressable onPress={handleToggle} style={[styles.iconBtn, { marginLeft: 8 }]}>
               <Ionicons name="ellipsis-horizontal-circle-outline" size={28} color={theme.primary} />

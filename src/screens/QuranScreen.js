@@ -25,6 +25,7 @@ import {
 } from '../services';
 import { triggerHaptic } from '../services/HapticsService';
 import { isFeatureEnabled } from '../config/features';
+import { getReciterById } from '../constants/reciters';
 
 import quranData from '../../data/quran_full.json';
 import translationsData from '../../data/quran_translations.json';
@@ -62,6 +63,7 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const [showAudioSheet, setShowAudioSheet] = useState(false);
+  const [reciterName, setReciterName] = useState('Mishary Al-Afasy');
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -103,6 +105,16 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
   useEffect(() => {
     return () => { if (sound) sound.unloadAsync(); };
   }, [sound]);
+
+  // Stop audio when leaving screen (back button, tab switch)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      if (sound) sound.stopAsync();
+      setIsPlaying(false);
+      setIsLoadingAudio(false);
+    });
+    return unsubscribe;
+  }, [navigation, sound]);
 
   // Session Management
   useEffect(() => {
@@ -179,6 +191,8 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
       // Get selected reciter from settings
       const settings = await getSettings();
       const reciter = settings.selectedReciter || 'Alafasy_128kbps';
+      const reciterInfo = getReciterById(reciter);
+      setReciterName(reciterInfo.name);
 
       const surahNum = String(selectedSurah.number).padStart(3, '0');
       const ayahNum = String(selectedSurah.ayahs[currentAyahIndex].number).padStart(3, '0');
@@ -235,6 +249,12 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
 
     triggerHaptic('light', 'nav');
 
+    // Stop audio before changing verse (prevents overlap)
+    if (isPlaying && sound) {
+      sound.stopAsync();
+      setIsPlaying(false);
+    }
+
     if (dir === 'next') {
       if (currentAyahIndex < selectedSurah.ayahs.length - 1) {
         setCurrentAyahIndex(p => p + 1);
@@ -257,7 +277,7 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
         }
       }
     }
-  }, [selectedSurah, currentAyahIndex, surahs, handleSurahSelect]);
+  }, [selectedSurah, currentAyahIndex, surahs, handleSurahSelect, isPlaying, sound]);
 
   // Gestures
   const panResponder = useMemo(() => PanResponder.create({
@@ -431,6 +451,7 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
                 translation={transText}
                 onToggleControls={() => { triggerHaptic('light', 'tap'); setShowAudioSheet(prev => !prev); }}
                 isPlaying={isPlaying}
+                isLoadingAudio={isLoadingAudio}
                 onPlay={playAyah}
                 isBookmarked={!!currentBookmarkId}
                 onBookmark={toggleBookmark}
@@ -460,6 +481,7 @@ const QuranScreen = ({ navigation, route, onSurahChange }) => {
         isPlaying={isPlaying}
         onPlayPause={playAyah}
         onStop={() => { if (sound) sound.stopAsync(); setIsPlaying(false); }}
+        reciterName={reciterName}
         onAnalyticsPress={() => setShowStatsModal(true)}
         onRelatedPress={() => alert('Related Hadith/Adhkar coming soon')}
       />

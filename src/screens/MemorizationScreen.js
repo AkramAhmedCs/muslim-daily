@@ -89,7 +89,7 @@ const MemorizationScreen = ({ navigation }) => {
             <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Due Today</Text>
           </Card>
           <Card style={styles.statCard}>
-            <Text style={[styles.statValue, { color: '#4CAF50' }]}>{stats.masteredCount}</Text>
+            <Text style={[styles.statValue, { color: theme.success || theme.primary }]}>{stats.masteredCount}</Text>
             <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Mastered</Text>
           </Card>
           <Card style={styles.statCard}>

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { I18nManager } from 'react-native';
+import { I18nManager, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Updates from 'expo-updates';
 
 const LanguageContext = createContext();
 
@@ -32,11 +33,35 @@ export const LanguageProvider = ({ children }) => {
     try {
       await AsyncStorage.setItem(LANGUAGE_KEY, newLang);
       setLanguage(newLang);
-      setIsRTL(newLang === 'ar');
+      const shouldBeRTL = newLang === 'ar';
+      setIsRTL(shouldBeRTL);
 
-      // Note: Full RTL layout change requires app restart
-      // I18nManager.forceRTL only takes effect after restart
-      // For now, we handle RTL at component level
+      // Apply RTL layout — requires app reload to take effect
+      if (I18nManager.isRTL !== shouldBeRTL) {
+        I18nManager.forceRTL(shouldBeRTL);
+        I18nManager.allowRTL(shouldBeRTL);
+        // Prompt user to reload for RTL to take effect
+        Alert.alert(
+          shouldBeRTL ? 'إعادة التشغيل مطلوبة' : 'Restart Required',
+          shouldBeRTL
+            ? 'يرجى إعادة تشغيل التطبيق لتطبيق اتجاه الكتابة من اليمين لليسار.'
+            : 'Please restart the app to apply the layout direction change.',
+          [
+            { text: shouldBeRTL ? 'لاحقاً' : 'Later', style: 'cancel' },
+            {
+              text: shouldBeRTL ? 'إعادة التشغيل' : 'Restart Now',
+              onPress: async () => {
+                try {
+                  await Updates.reloadAsync();
+                } catch (e) {
+                  // Fallback if Updates not available (dev mode)
+                  console.warn('Updates.reloadAsync failed, manual restart needed:', e);
+                }
+              },
+            },
+          ]
+        );
+      }
     } catch (error) {
       console.error('Error saving language:', error);
     }
@@ -136,6 +161,66 @@ export const LanguageProvider = ({ children }) => {
       about: language === 'ar' ? 'حول' : 'About',
       version: language === 'ar' ? 'الإصدار' : 'Version',
       sources: language === 'ar' ? 'المصادر' : 'Sources',
+
+      // Home Screen
+      dailyChecklist: language === 'ar' ? 'قائمة المهام اليومية' : 'Daily Checklist',
+      quickAccess: language === 'ar' ? 'وصول سريع' : 'Quick Access',
+      tasksCompleted: language === 'ar' ? 'مهام مكتملة' : 'tasks completed',
+      dayStreak: language === 'ar' ? 'يوم متتالي' : 'day streak',
+      best: language === 'ar' ? 'أفضل' : 'Best',
+      search: language === 'ar' ? 'بحث' : 'Search',
+      prayerTimes: language === 'ar' ? 'أوقات الصلاة' : 'Prayer Times',
+      bookmarks: language === 'ar' ? 'الإشارات المرجعية' : 'Bookmarks',
+      hifz: language === 'ar' ? 'الحفظ' : 'Hifz',
+      goals: language === 'ar' ? 'الأهداف' : 'Goals',
+      qibla: language === 'ar' ? 'القبلة' : 'Qibla',
+      featured: language === 'ar' ? 'مميز' : 'Featured',
+      readNow: language === 'ar' ? 'اقرأ الآن' : 'Read Now',
+      viewAll: language === 'ar' ? 'عرض الكل' : 'View All',
+
+      // Ramadan Challenge
+      ramadanChallenge: language === 'ar' ? 'تحدي رمضان' : 'Ramadan Challenge',
+      juzsCompleted: language === 'ar' ? 'أجزاء مكتملة' : 'Juzs completed',
+      completeQuranIn30Days: language === 'ar' ? 'ختم القرآن في 30 يوم' : 'Complete Quran in 30 days',
+      juzsDone: language === 'ar' ? 'أجزاء تمت' : 'Juzs done',
+      remaining: language === 'ar' ? 'متبقي' : 'remaining',
+      resetChallenge: language === 'ar' ? 'إعادة التحدي' : 'Reset Challenge',
+
+      // Qibla Finder
+      qiblaFinder: language === 'ar' ? 'اتجاه القبلة' : 'Qibla Finder',
+      qiblaDirection: language === 'ar' ? 'اتجاه القبلة' : 'Qibla Direction',
+      distanceToMecca: language === 'ar' ? 'المسافة إلى مكة' : 'Distance to Mecca',
+      locationRequired: language === 'ar' ? 'يلزم الوصول للموقع' : 'Location Access Required',
+      openSettings: language === 'ar' ? 'فتح الإعدادات' : 'Open Settings',
+      findingLocation: language === 'ar' ? 'جاري تحديد موقعك...' : 'Finding your location...',
+      compassNotAvailable: language === 'ar' ? 'البوصلة غير متوفرة' : 'Compass not available',
+
+      // Bookmarks
+      noBookmarks: language === 'ar' ? 'لا توجد إشارات مرجعية' : 'No Bookmarks',
+      addBookmarks: language === 'ar' ? 'أضف إشارات مرجعية أثناء القراءة' : 'Add bookmarks while reading',
+      removeBookmark: language === 'ar' ? 'حذف الإشارة المرجعية' : 'Remove Bookmark',
+
+      // Goals
+      readingGoals: language === 'ar' ? 'أهداف القراءة' : 'Reading Goals',
+      dailyPages: language === 'ar' ? 'صفحات يومية' : 'Daily Pages',
+      finishByDate: language === 'ar' ? 'الانتهاء بتاريخ' : 'Finish By Date',
+      noGoals: language === 'ar' ? 'لا توجد أهداف' : 'No Goals',
+      addGoal: language === 'ar' ? 'أضف هدفاً' : 'Add Goal',
+
+      // Memorization
+      hifzJourney: language === 'ar' ? 'رحلة الحفظ' : 'Hifz Journey',
+      memorized: language === 'ar' ? 'محفوظ' : 'Memorized',
+      review: language === 'ar' ? 'مراجعة' : 'Review',
+      startMemorizing: language === 'ar' ? 'ابدأ الحفظ' : 'Start Memorizing',
+
+      // Data Management
+      dataManagement: language === 'ar' ? 'إدارة البيانات' : 'Data Management',
+      resetAllData: language === 'ar' ? 'حذف جميع البيانات' : 'Reset All Data',
+      betaRecovery: language === 'ar' ? 'استعادة البيتا' : 'Beta Recovery',
+      setStreakManually: language === 'ar' ? 'ضبط التتابع يدوياً' : 'Set Streak Manually',
+      quranAudio: language === 'ar' ? 'صوت القرآن' : 'Quran Audio',
+      reciter: language === 'ar' ? 'القارئ' : 'Reciter',
+      prayer: language === 'ar' ? 'الصلاة' : 'Prayer',
     };
 
     return translations[key] || key;
